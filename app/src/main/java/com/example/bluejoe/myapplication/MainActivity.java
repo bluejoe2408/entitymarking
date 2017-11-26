@@ -14,18 +14,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button button_start = findViewById(R.id.button_start);
-        Button button_choose = findViewById(R.id.button_choose);
         button_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, MarkText.class);
+                Intent intent = new Intent(MainActivity.this, ChooseText.class);
                 startActivity(intent);
-            }
-        });
-        button_choose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                Choose a txt file
             }
         });
     }
