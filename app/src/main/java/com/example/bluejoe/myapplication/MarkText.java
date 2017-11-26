@@ -1,10 +1,17 @@
 package com.example.bluejoe.myapplication;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -16,6 +23,7 @@ public class MarkText extends AppCompatActivity {
 
     private TextView textView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +32,49 @@ public class MarkText extends AppCompatActivity {
         textView = (TextView)this.findViewById(R.id.text_view);
 
         showText();
+        ActionMode.Callback2 textSelectionActionModeCallback;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            textSelectionActionModeCallback = new ActionMode.Callback2() {
+                @Override
+                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                    MenuInflater menuInflater = actionMode.getMenuInflater();
+                    menuInflater.inflate(R.menu.selection_action_menu,menu);
+                    return true;//返回false则不会显示弹窗
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                    //根据item的ID处理点击事件
+                    switch (menuItem.getItemId()){
+                        case R.id.Informal22:
+                            Toast.makeText(MarkText.this, "点击的是22", Toast.LENGTH_SHORT).show();
+                            actionMode.finish();//收起操作菜单
+                            break;
+                        case R.id.Informal33:
+                            Toast.makeText(MarkText.this, "点击的是33", Toast.LENGTH_SHORT).show();
+                            actionMode.finish();
+                            break;
+                    }
+                    return false;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode actionMode) {
+
+                }
+
+                @Override
+                public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
+                    //可选  用于改变弹出菜单的位置
+                    super.onGetContentRect(mode, view, outRect);
+                }
+            };
+        }
     }
 
     public void showText() {
@@ -71,4 +122,9 @@ public class MarkText extends AppCompatActivity {
         }
         return sb.toString();
     }
+
+
+
+
+
 }
