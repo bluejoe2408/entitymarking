@@ -5,11 +5,13 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/button_start"
+        android:id="@+id/button_choose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/start" />
+        android:text="@string/choose" />
+
+    <ListView
+        android:id="@+id/text_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>
-
-
-
