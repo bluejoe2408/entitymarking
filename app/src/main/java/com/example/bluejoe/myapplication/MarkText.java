@@ -1,10 +1,16 @@
 package com.example.bluejoe.myapplication;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.style.BackgroundColorSpan;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,7 +28,24 @@ import java.io.UnsupportedEncodingException;
 public class MarkText extends AppCompatActivity {
 
     private TextView textView;
+    SpannableString spanString;
+    private void addBackColorSpan(int s, int e, int index) {
 
+        BackgroundColorSpan span;
+        switch (index) {
+            case 1:
+                span = new BackgroundColorSpan(Color.YELLOW);
+                break;
+            case 2:
+                span = new BackgroundColorSpan(Color.GREEN);
+                break;
+            default:
+                span = new BackgroundColorSpan(Color.WHITE);
+                break;
+        }
+        spanString.setSpan(span, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(spanString);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,52 +56,7 @@ public class MarkText extends AppCompatActivity {
         showText();
 
 
-        ActionMode.Callback2 textSelectionActionModeCallback;
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-        {
-            textSelectionActionModeCallback = new ActionMode.Callback2() {
-                @Override
-                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                    MenuInflater menuInflater = actionMode.getMenuInflater();
-                    menuInflater.inflate(R.menu.selection_action_menu,menu);
-                    return true;//返回false则不会显示弹窗
-                }
-
-                @Override
-                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                    return false;
-                }
-
-                @Override
-                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                    //根据item的ID处理点击事件
-                    switch (menuItem.getItemId()){
-                        case R.id.human:
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();//收起操作菜单
-                            break;
-                        case R.id.place:
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();
-                            break;
-                    }
-                    return false;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
-                }
-
-                @Override
-                public void onDestroyActionMode(ActionMode actionMode) {
-
-                }
-
-                @Override
-                public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
-                    //可选  用于改变弹出菜单的位置
-                    super.onGetContentRect(mode, view, outRect);
-                }
-            };
-            textView.setCustomSelectionActionModeCallback(textSelectionActionModeCallback);
-        }
 
     }
 
@@ -86,6 +64,7 @@ public class MarkText extends AppCompatActivity {
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
         textView.setTextSize(18);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
         //textView.setMovementMethod(new ScrollingMovementMethod());
 //        InputStream inputStream = getResources().openRawResource(R.raw.t0);
 //        InputStream inputStream = null;
@@ -110,12 +89,67 @@ public class MarkText extends AppCompatActivity {
 //                        "据此前报道，31日，日本首相安倍晋三（自民党总裁）在该党高层会议上正式宣布，11月1日第四届安倍内阁启动后党内四大要职将全部留任。安倍在会上呼吁团结称，“不辜负国民的托付，一项一项切实兑现选举承诺十分重要。”四大要职以外的党高层除了议员退职和众院选举落选者外都将继续任用。关于修宪，自民党把最快于明年由国会提议纳入考虑。以在《宪法》第九条中写明自卫队存在为主的该党修宪草案拟最快在明年初提交给例行国会，以便朝野各党展开讨论。（编译/海外网 巩浩）";
 //        String string = getString(inputStream);
         Intent intent = getIntent();
-        String string = intent.getStringExtra("string");
+        final String string = intent.getStringExtra("string");
         textView.setText(string);
-        textView.setPadding(5, 0, 5, 0);
+        spanString = new SpannableString(string);
+
         /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         params.setMargins(10,10,10,10);
         textView.setLayoutParams(params);*/
+        final ActionMode.Callback2 textSelectionActionModeCallback;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
+        {
+            textSelectionActionModeCallback = new ActionMode.Callback2() {
+                @Override
+                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                    MenuInflater menuInflater = actionMode.getMenuInflater();
+                    menuInflater.inflate(R.menu.selection_action_menu,menu);
+                    return true;//返回false则不会显示弹窗
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                @TargetApi(Build.VERSION_CODES.M)
+                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                    //根据item的ID处理点击事件
+                    switch (menuItem.getItemId()){
+                        case R.id.human:
+                            int selectionStart = textView.getSelectionStart();
+                            int selectionEnd = textView.getSelectionEnd();
+                            addBackColorSpan(selectionStart,selectionEnd, 1);
+                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
+                            actionMode.finish();//收起操作菜单
+                            break;
+                        case R.id.place:
+                            selectionStart = textView.getSelectionStart();
+                            selectionEnd = textView.getSelectionEnd();
+                            addBackColorSpan(selectionStart,selectionEnd, 2);
+                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
+                            actionMode.finish();
+                            break;
+                    }
+                    return false;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode actionMode) {
+
+                }
+
+                @Override
+                public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
+                    //可选  用于改变弹出菜单的位置
+                    super.onGetContentRect(mode, view, outRect);
+                }
+            };
+            textView.setCustomSelectionActionModeCallback(textSelectionActionModeCallback);
+        }
+
     }
 
     public static String getString(InputStream inputStream) {
