@@ -40,7 +40,7 @@ public class MarkText extends AppCompatActivity {
                 span = new BackgroundColorSpan(Color.GREEN);
                 break;
             default:
-                span = new BackgroundColorSpan(Color.WHITE);
+                span = new BackgroundColorSpan(Color.TRANSPARENT);
                 break;
         }
         spanString.setSpan(span, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -130,6 +130,13 @@ public class MarkText extends AppCompatActivity {
                             selectionEnd = textView.getSelectionEnd();
                             addBackColorSpan(selectionStart,selectionEnd, 2);
                             Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
+                            actionMode.finish();
+                            break;
+                        case R.id.cancel:
+                            selectionStart = textView.getSelectionStart();
+                            selectionEnd = textView.getSelectionEnd();
+                            addBackColorSpan(selectionStart,selectionEnd, 0);
+                            Toast.makeText(MarkText.this, "取消成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();
                             break;
                     }
