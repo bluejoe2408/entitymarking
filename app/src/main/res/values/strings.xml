@@ -3,4 +3,6 @@
     <string name="welcomestring">welcome to android!</string>
     <string name="start">Start</string>
     <string name="choose">Choose from disk</string>
+    <string name="人">人</string>
+    <string name="地点">地点</string>
 </resources>

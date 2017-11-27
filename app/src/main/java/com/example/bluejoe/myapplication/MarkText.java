@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,10 +30,13 @@ public class MarkText extends AppCompatActivity {
         setContentView(R.layout.activity_mark_text);
 
         textView = (TextView)this.findViewById(R.id.text_view);
-
         showText();
+
+
         ActionMode.Callback2 textSelectionActionModeCallback;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
+        {
             textSelectionActionModeCallback = new ActionMode.Callback2() {
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -52,12 +54,12 @@ public class MarkText extends AppCompatActivity {
                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                     //根据item的ID处理点击事件
                     switch (menuItem.getItemId()){
-                        case R.id.Informal22:
-                            Toast.makeText(MarkText.this, "点击的是22", Toast.LENGTH_SHORT).show();
+                        case R.id.human:
+                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();//收起操作菜单
                             break;
-                        case R.id.Informal33:
-                            Toast.makeText(MarkText.this, "点击的是33", Toast.LENGTH_SHORT).show();
+                        case R.id.place:
+                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();
                             break;
                     }
@@ -75,14 +77,16 @@ public class MarkText extends AppCompatActivity {
                     super.onGetContentRect(mode, view, outRect);
                 }
             };
+            textView.setCustomSelectionActionModeCallback(textSelectionActionModeCallback);
         }
+
     }
 
     public void showText() {
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
         textView.setTextSize(18);
-        textView.setMovementMethod(new ScrollingMovementMethod());
+        //textView.setMovementMethod(new ScrollingMovementMethod());
 //        InputStream inputStream = getResources().openRawResource(R.raw.t0);
 //        InputStream inputStream = null;
 //        try {
@@ -108,6 +112,10 @@ public class MarkText extends AppCompatActivity {
         Intent intent = getIntent();
         String string = intent.getStringExtra("string");
         textView.setText(string);
+        textView.setPadding(5, 0, 5, 0);
+        /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        params.setMargins(10,10,10,10);
+        textView.setLayoutParams(params);*/
     }
 
     public static String getString(InputStream inputStream) {
