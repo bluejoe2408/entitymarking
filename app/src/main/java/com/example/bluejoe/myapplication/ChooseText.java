@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +20,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -71,6 +74,7 @@ public class ChooseText extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        writeFile();
     }
 
     private void openFileManager() {
@@ -169,5 +173,31 @@ public class ChooseText extends AppCompatActivity {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    public void writeFile() {
+        try {
+            File file = new File(Environment.getExternalStorageDirectory(), "test.txt");
+            FileOutputStream fos = new FileOutputStream(file);
+            String info = "I am a chinese!";
+            fos.write(info.getBytes());
+            fos.close();
+            Log.d(TAG, "writeFile: Success");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String filePath = getDefaultFilePath();
+        Log.d(TAG, "writeFile: " + filePath);
+    }
+
+    public static String getDefaultFilePath() {
+        String filepath;
+        File file = new File(Environment.getExternalStorageDirectory(), "test.txt");
+        if (file.exists()) {
+            filepath = file.getAbsolutePath();
+        } else {
+            filepath = "Does not Exist";
+        }
+        return filepath;
     }
 }
