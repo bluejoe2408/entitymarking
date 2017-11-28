@@ -116,14 +116,16 @@ public class MarkText extends AppCompatActivity {
             textSelectionActionModeCallback = new ActionMode.Callback2() {
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-                    MenuInflater menuInflater = actionMode.getMenuInflater();
-                    menuInflater.inflate(R.menu.selection_action_menu,menu);
+
                     return true;//返回false则不会显示弹窗
                 }
 
                 @Override
                 public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                    return false;
+                    MenuInflater menuInflater = actionMode.getMenuInflater();
+                    menu.clear();
+                    menuInflater.inflate(R.menu.selection_action_menu,menu);
+                    return true;
                 }
 
                 @Override
@@ -153,7 +155,7 @@ public class MarkText extends AppCompatActivity {
                             actionMode.finish();
                             break;
                     }
-                    return false;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
+                    return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
                 }
 
                 @Override
