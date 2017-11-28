@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -12,6 +13,7 @@ import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.style.BackgroundColorSpan;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,11 +26,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+
 
 public class MarkText extends AppCompatActivity {
 
     private TextView textView;
     SpannableString spanString;
+    private ViewPager vpager_one;
+    private ArrayList<View> aList;
+    private MyPagerAdapter mAdapter;
+
     private void addBackColorSpan(int s, int e, int index) {
 
         BackgroundColorSpan span;
@@ -50,14 +58,19 @@ public class MarkText extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mark_text);
-
-        textView = (TextView)this.findViewById(R.id.text_view);
+        LayoutInflater inflate = LayoutInflater.from(this);
+        View view = inflate.inflate(R.layout.activity_mark_text,null);
+        textView = view.findViewById(R.id.text_view);
         showText();
-
-
-
-
+        setContentView(R.layout.activity_page);
+        vpager_one = (ViewPager) findViewById(R.id.vpager_one);
+        aList = new ArrayList<>();
+        LayoutInflater li = getLayoutInflater();
+        aList.add(view);
+        aList.add(li.inflate(R.layout.activity_mark_relation,null,false));
+        aList.add(li.inflate(R.layout.activity_mark_relation,null,false));
+        mAdapter = new MyPagerAdapter(aList);
+        vpager_one.setAdapter(mAdapter);
     }
 
     public void showText() {

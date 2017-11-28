@@ -73,6 +73,7 @@ public class ChooseText extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 String string = getString(inputStream);
+                //Intent intent = new Intent(ChooseText.this, MarkText.class);
                 Intent intent = new Intent(ChooseText.this, MarkText.class);
                 intent.putExtra("string", string);
                 startActivity(intent);
