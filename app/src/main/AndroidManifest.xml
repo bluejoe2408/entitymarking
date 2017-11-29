@@ -18,8 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MarkText" />
-        <activity android:name=".ChooseText" />
+        <activity android:name=".MarkText"/>
+        <activity android:name=".ChooseText"
+            android:label="@string/select_default"/>
     </application>
 
 </manifest>

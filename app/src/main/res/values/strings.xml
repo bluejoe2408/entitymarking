@@ -1,9 +1,14 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Entity Marking</string>
     <string name="welcomestring">welcome to android!</string>
-    <string name="start">Start</string>
+    <string name="start">开始</string>
     <string name="choose">Choose from disk</string>
     <string name="人">人</string>
     <string name="地点">地点</string>
     <string name="取消">取消</string>
+    <string name="entity">Entity</string>
+    <string name="marking">Marking</string>
+    <string name="version">ver 1.0</string>
+    <string name="select_text">从手机选择文本</string>
+    <string name="select_default">选择预置文本</string>
 </resources>
