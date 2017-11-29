@@ -66,7 +66,7 @@ public class ChooseText extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                String string = getString(inputStream);
+                ArrayList<CharSequence> string = getString(inputStream);
                 //Intent intent = new Intent(ChooseText.this, MarkText.class);
                 Intent intent = new Intent(ChooseText.this, MarkText.class);
                 intent.putExtra("string", string);
@@ -75,8 +75,9 @@ public class ChooseText extends AppCompatActivity {
         });
     }
 
-    public static String getString(InputStream inputStream) {
+    public static ArrayList<CharSequence> getString(InputStream inputStream) {
         InputStreamReader inputStreamReader = null;
+        ArrayList<CharSequence> string = new ArrayList<CharSequence>();
         try {
             inputStreamReader = new InputStreamReader(inputStream, "utf-8");
         } catch (UnsupportedEncodingException e1) {
@@ -89,12 +90,14 @@ public class ChooseText extends AppCompatActivity {
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
+                if(!line.equals("")) string.add(line);
                 sb.append("\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return sb.toString();
+        string.add(sb.toString());
+        return string;
     }
 
     private void initTextList() {
