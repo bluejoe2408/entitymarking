@@ -44,13 +44,17 @@ public class MainActivity extends Activity {
 
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);
-        TextView title_version = findViewById(R.id.title_version);
+        final TextView title_version = findViewById(R.id.title_version);
         final Button button_start = findViewById(R.id.button_start);
         final Button button_choose = findViewById(R.id.button_choose);
         final Button button_default = findViewById(R.id.button_default);
         final Typeface ventouse = Typeface.createFromAsset(getAssets(), "fonts/ventouse.ttf");
         final Animation move_btn_start = AnimationUtils.loadAnimation(this, R.anim.move_btn_start);
         final Animation move_btn_choose_text = AnimationUtils.loadAnimation(this, R.anim.move_btn_choose_text);
+        final Animation move_title_left = AnimationUtils.loadAnimation(this, R.anim.move_title_left);
+        final Animation move_title_right = AnimationUtils.loadAnimation(this, R.anim.move_title_right);
+        final Animation move_title_up = AnimationUtils.loadAnimation(this, R.anim.move_title_up);
+        final Animation show_btn_start = AnimationUtils.loadAnimation(this, R.anim.show_btn_start);
 
         title_entity.setTypeface(ventouse);
         title_marking.setTypeface(ventouse);
@@ -92,6 +96,27 @@ public class MainActivity extends Activity {
                 button_default.setVisibility(View.VISIBLE);
                 button_choose.setAnimation(move_btn_choose_text);
                 button_default.setAnimation(move_btn_choose_text);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        title_entity.setAnimation(move_title_left);
+        title_marking.setAnimation(move_title_right);
+
+        move_title_left.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                title_version.setVisibility(View.VISIBLE);
+                title_version.setAnimation(move_title_up);
+                button_start.setVisibility(View.VISIBLE);
+                button_start.setAnimation(show_btn_start);
             }
 
             @Override

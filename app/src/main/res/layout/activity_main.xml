@@ -53,7 +53,8 @@
             android:shadowDx="8"
             android:shadowDy="8"
             android:textStyle="bold"
-            android:text="@string/version"/>
+            android:text="@string/version"
+            android:visibility="invisible"/>
     </LinearLayout>
 
     <LinearLayout
@@ -78,7 +79,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/btn_style"
-            android:text="@string/start" />
+            android:text="@string/start"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/button_default"
