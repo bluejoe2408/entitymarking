@@ -11,15 +11,20 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -266,15 +271,26 @@ public class ChooseText extends AppCompatActivity {
     }
 
     private void initTextList() {
-        TextList sample1 = new TextList("Sample Text 1", "t0.txt");
+        TextList sample1 = new TextList("Sample Text 1", "texts/t0.txt");
         textList.add(sample1);
-        TextList sample2 = new TextList("Sample Text 2", "t1.txt");
+        TextList sample2 = new TextList("Sample Text 2", "texts/t1.txt");
         textList.add(sample2);
-        TextList sample3 = new TextList("Sample Text 3", "t2.txt");
+        TextList sample3 = new TextList("Sample Text 3", "texts/t2.txt");
         textList.add(sample3);
-        TextList sample4 = new TextList("Sample Text 4", "t3.txt");
+        TextList sample4 = new TextList("Sample Text 4", "texts/t3.txt");
         textList.add(sample4);
-        TextList sample5 = new TextList("Sample Text 5", "t4.txt");
+        TextList sample5 = new TextList("Sample Text 5", "texts/t4.txt");
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
+        textList.add(sample5);
         textList.add(sample5);
     }
 
@@ -310,6 +326,59 @@ public class ChooseText extends AppCompatActivity {
             Log.d(TAG, "writeDefaultFile: Success");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    class TextList {
+
+        private String name;
+        private String filename;
+
+        TextList(String name, String filename) {
+            this.name = name;
+            this.filename = filename;
+        }
+
+        String getName() {
+            return name;
+        }
+
+        String getFilename() {
+            return filename;
+        }
+    }
+
+    class TextListAdapter extends ArrayAdapter<TextList> {
+
+        private int resourceId;
+
+        TextListAdapter(@NonNull Context context, int resource, @NonNull List<TextList> objects) {
+            super(context, resource, objects);
+            resourceId = resource;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            TextList textList = getItem(position);
+            View view;
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.textName = view.findViewById(R.id.text_name);
+                view.setTag(viewHolder);
+            } else {
+                view = convertView;
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            assert textList != null;
+            viewHolder.textName.setText(textList.getName());
+            return view;
+        }
+
+        class ViewHolder {
+            TextView textName;
         }
     }
 }
