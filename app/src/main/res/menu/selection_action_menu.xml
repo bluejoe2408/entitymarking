@@ -7,7 +7,4 @@
     <item
         android:id="@+id/place"
         android:title="@string/地点" />
-    <item
-        android:id="@+id/cancel"
-        android:title="@string/取消"/>
 </menu>

@@ -10,8 +10,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
 import android.text.style.BackgroundColorSpan;
+import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,28 +34,44 @@ import java.util.ArrayList;
 
 
 public class MarkText extends AppCompatActivity {
-
+    private static final String TAG = "MarkText";
     private TextView textView;
     SpannableString spanString;
     private ViewPager vpager_one;
     private ArrayList<View> aList;
     private MyPagerAdapter mAdapter;
 
-    private void addBackColorSpan(int s, int e, int index) {
+
+    private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int s,final int e, int index) {
 
         BackgroundColorSpan span;
-        switch (index) {
-            case 1:
+        if(index ==1)
                 span = new BackgroundColorSpan(Color.YELLOW);
-                break;
-            case 2:
+          else
                 span = new BackgroundColorSpan(Color.GREEN);
-                break;
-            default:
-                span = new BackgroundColorSpan(Color.TRANSPARENT);
-                break;
-        }
         spanString.setSpan(span, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        final ClickableSpan clickSpan2 = new ClickableSpan() {
+            @Override
+            public void updateDrawState(TextPaint ds) {
+
+                ds.setColor(Color.parseColor("#000000"));
+                ds.setUnderlineText(false); //去掉下划线
+            }
+
+            @Override
+            public void onClick(View widget) {
+                Toast.makeText(MarkText.this, "取消成功" , Toast.LENGTH_SHORT).show();
+                BackgroundColorSpan span= new BackgroundColorSpan(Color.TRANSPARENT);
+                spanString.setSpan(span, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                spanString.removeSpan(this);
+                textView.setText(spanString);
+            }
+        };
+        spanString.setSpan(clickSpan2, s, e, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+
+
         textView.setText(spanString);
     }
 
@@ -59,7 +79,8 @@ public class MarkText extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         LayoutInflater inflate = LayoutInflater.from(this);
-        View view = inflate.inflate(R.layout.activity_mark_text,null);
+        View view;
+        view = inflate.inflate(R.layout.activity_mark_text,null);
         textView = view.findViewById(R.id.text_view);
         showText();
         setContentView(R.layout.activity_page);
@@ -116,68 +137,8 @@ public class MarkText extends AppCompatActivity {
         /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         params.setMargins(10,10,10,10);
         textView.setLayoutParams(params);*/
-        final ActionMode.Callback2 textSelectionActionModeCallback;
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
-        {
-            textSelectionActionModeCallback = new ActionMode.Callback2() {
-                @Override
-                public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 
-                    return true;//返回false则不会显示弹窗
-                }
-
-                @Override
-                public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                    MenuInflater menuInflater = actionMode.getMenuInflater();
-                    menu.clear();
-                    menuInflater.inflate(R.menu.selection_action_menu,menu);
-                    return true;
-                }
-
-                @Override
-                @TargetApi(Build.VERSION_CODES.M)
-                public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-                    //根据item的ID处理点击事件
-                    switch (menuItem.getItemId()){
-                        case R.id.human:
-                            int selectionStart = textView.getSelectionStart();
-                            int selectionEnd = textView.getSelectionEnd();
-                            addBackColorSpan(selectionStart,selectionEnd, 1);
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();//收起操作菜单
-                            break;
-                        case R.id.place:
-                            selectionStart = textView.getSelectionStart();
-                            selectionEnd = textView.getSelectionEnd();
-                            addBackColorSpan(selectionStart,selectionEnd, 2);
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();
-                            break;
-                        case R.id.cancel:
-                            selectionStart = textView.getSelectionStart();
-                            selectionEnd = textView.getSelectionEnd();
-                            addBackColorSpan(selectionStart,selectionEnd, 0);
-                            Toast.makeText(MarkText.this, "取消成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();
-                            break;
-                    }
-                    return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
-                }
-
-                @Override
-                public void onDestroyActionMode(ActionMode actionMode) {
-
-                }
-
-                @Override
-                public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
-                    //可选  用于改变弹出菜单的位置
-                    super.onGetContentRect(mode, view, outRect);
-                }
-            };
-            textView.setCustomSelectionActionModeCallback(textSelectionActionModeCallback);
-        }
 
     }
 
@@ -222,6 +183,9 @@ public class MarkText extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
         {
             textSelectionActionModeCallback = new ActionMode.Callback2() {
+                TextView curTextView = textView;
+                SpannableString curSpanString = spanString;
+                CharSequence s = textView.getText();
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 
@@ -240,27 +204,33 @@ public class MarkText extends AppCompatActivity {
                 @TargetApi(Build.VERSION_CODES.M)
                 public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                     //根据item的ID处理点击事件
+                    TextView tmpTextView;
+                    View tmpView;
+                    LayoutInflater tmpinflate = LayoutInflater.from(MarkText.this);
+
+                    Log.d(TAG, "onActionItemClicked: ");
                     switch (menuItem.getItemId()){
                         case R.id.human:
-                            int selectionStart = textView.getSelectionStart();
-                            int selectionEnd = textView.getSelectionEnd();
-                            addBackColorSpan(selectionStart,selectionEnd, 1);
+                            int selectionStart = curTextView.getSelectionStart();
+                            int selectionEnd = curTextView.getSelectionEnd();
+                            addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, 1);
                             Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();//收起操作菜单
+                            tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
+                            tmpTextView = tmpView.findViewById(R.id.relation_name);
+                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);
                             break;
                         case R.id.place:
-                            selectionStart = textView.getSelectionStart();
-                            selectionEnd = textView.getSelectionEnd();
-                            addBackColorSpan(selectionStart,selectionEnd, 2);
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
+                            selectionStart = curTextView.getSelectionStart();
+                            selectionEnd = curTextView.getSelectionEnd();
+                            Log.d(TAG, "onActionItemClicked: "+selectionStart);
+
+                            addBackColorSpan(curTextView,curSpanString,selectionStart,selectionEnd, 2);
+                            Toast.makeText(MarkText.this, s.subSequence(selectionStart,selectionEnd), Toast.LENGTH_SHORT).show();
                             actionMode.finish();
-                            break;
-                        case R.id.cancel:
-                            selectionStart = textView.getSelectionStart();
-                            selectionEnd = textView.getSelectionEnd();
-                            addBackColorSpan(selectionStart,selectionEnd, 0);
-                            Toast.makeText(MarkText.this, "取消成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();
+                            tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
+                            tmpTextView = tmpView.findViewById(R.id.relation_name);
+                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);
                             break;
                     }
                     return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
@@ -279,33 +249,5 @@ public class MarkText extends AppCompatActivity {
             };
             textView.setCustomSelectionActionModeCallback(textSelectionActionModeCallback);
         }
-
     }
-
-    public static String getString(InputStream inputStream) {
-        InputStreamReader inputStreamReader = null;
-        try {
-            inputStreamReader = new InputStreamReader(inputStream, "utf-8");
-        } catch (UnsupportedEncodingException e1) {
-            e1.printStackTrace();
-        }
-        assert inputStreamReader != null;
-        BufferedReader reader = new BufferedReader(inputStreamReader);
-        StringBuilder sb = new StringBuilder("");
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-                sb.append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
-
-
-
-
 }

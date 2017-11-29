@@ -16,12 +16,15 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,11 +40,15 @@ public class MainActivity extends Activity {
 
     private static final int FILE_SELECT_CODE = 1;
 
+    private static final String TAG = "MainActivity";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Gson gson = new Gson();
+        Array array = new Array();
 
+        Log.d(TAG, "onCreate: "+gson.toJson(array));
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);
         final TextView title_version = findViewById(R.id.title_version);
