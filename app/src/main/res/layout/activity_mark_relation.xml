@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/sentence_text_view"
-        android:layout_margin="10dp"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars = "vertical"
-        android:textIsSelectable = "true"/>
+        android:layout_height="0dp"
+        android:layout_weight="4" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6">
+    </ListView>
 </LinearLayout>

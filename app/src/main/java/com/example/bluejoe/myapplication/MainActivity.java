@@ -75,6 +75,8 @@ public class MainActivity extends Activity {
         button_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Intent intent = new Intent(MainActivity.this, testActivity.class);
+//                startActivity(intent);
 //                Choose a txt file
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
