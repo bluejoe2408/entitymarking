@@ -30,6 +30,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -47,7 +49,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         Gson gson = new Gson();
-        Mention mention = new Mention("ebsfbeiukf", 0, "catdoglovecatdoglovecatdoglove");
+        Mention mention = new Mention(0, "catdoglovecatdoglovecatdoglove");
         mention.addEntity("cat", "animal", 0);
         mention.addEntity("dog", "animal", 3);
         mention.addRelation(0, 3, "love");
@@ -64,7 +66,16 @@ public class MainActivity extends Activity {
         Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.removeEntity(10);
         Log.d(TAG, "onCreate: "+gson.toJson(mention));
-
+        if (saveJSON(mention)) {
+            String articleId = mention.getArticleId();
+            String sentenceText = mention.getSentenceText();
+            if (checkJSON(sentenceText)) {
+                Log.d(TAG, "onCreate: checkJSON success");
+                File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+                Mention newMention = loadJSON(file);
+                Log.d(TAG, "onCreate: get mention md5 " + newMention.getArticleId());
+            }
+        }
 
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);
@@ -357,5 +368,69 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+
+    public boolean saveJSON(Mention mention) {
+        Gson gson = new Gson();
+        String json = gson.toJson(mention);
+        String articleId = mention.getArticleId();
+        // Write json to file
+        File dict = new File(Environment.getExternalStorageDirectory(), "entity_marking");
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+        try {
+            if (!dict.exists()) {
+                if (!dict.mkdir()) {
+                    return false;
+                }
+            }
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(json.getBytes());
+            fos.close();
+            Log.d(TAG, "saveJSON: success");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(TAG, "saveJSON: failed");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * 从JSON文件中解析Mention类
+     * @param file File类对象
+     * @return Mention类对象
+     */
+    public Mention loadJSON(File file) {
+        Gson gson = new Gson();
+        BufferedReader reader = null;
+        Mention mention = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String string;
+            string = reader.readLine();
+            mention = gson.fromJson(string, Mention.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return mention;
+    }
+
+    /**
+     * 检查该文本是否已经过标注
+     * @param string String类型文本内容
+     * @return 布尔值，1表示已经过标注
+     */
+    public boolean checkJSON(String string){
+        String articleId = Mention.getMD5(string);
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+        return file.exists();
     }
 }
