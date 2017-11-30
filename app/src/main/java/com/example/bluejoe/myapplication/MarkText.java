@@ -30,13 +30,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.weigan.loopview.LoopView;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -50,25 +53,25 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.weigan.loopview.LoopView;
+
 public class MarkText extends AppCompatActivity {
+    public ArrayList<Mention> mentionArray;
     private static final String TAG = "MarkText";
     private TextView textView;
     SpannableString spanString;
-    private ArrayList<View> aV = new ArrayList<View>();
-    private ViewPager vpager_one;
-    private ArrayList<View> aList;
-    private MyPagerAdapter mAdapter;
-    private ArrayList<List<CardView>> mData = new ArrayList<List<CardView>>();
-    private List<CardList> mCard = new ArrayList<>();
-    private List<String> data = new ArrayList<>();
-    private int cur_state = 0;
-    private String ss = new String(),sss = new String();
-    private String s = new String();
+    private ArrayList<View> aV = new ArrayList<>();
 
-    private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index) {
+    private List<ArrayList<CardList>> mCard = new ArrayList<>();
+    private ArrayList<View> tmpCard = new ArrayList<>();
+    private int cur_state = 0;
+    private String ss,sss;
+    private String s;
+    private CardAdapter adapter;
+
+    private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index,final int ii) {
 
         BackgroundColorSpan span;
+
         if(index ==1) {
             span = new BackgroundColorSpan(Color.YELLOW);
 
@@ -95,13 +98,25 @@ public class MarkText extends AppCompatActivity {
                 spanString.removeSpan(this);
                 textView.setText(spanString);}
                 else if(cur_state==1){
+
+                    Log.d(TAG, "onClick: s"+s);
                     ss = (String) s.subSequence(st,e);
+                    Log.d(TAG, "onClick: ss"+ss);
+                    Log.d(TAG, "onClick: mv"+adapter.mview);
+                    TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext1);
+                    tmpc.setText(ss);
+                    mCard.get(ii).get(mCard.get(ii).size()-1).start1 = ss;
                     cur_state=2;
                 }
                 else if(cur_state==2){
                     sss = (String) s.subSequence(st,e);
-                    cur_state = 0;
+                    Log.d(TAG, "onClick: sss"+sss);
+                    TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext2);
+                    tmpc.setText(sss);
+                    mCard.get(ii).get(mCard.get(ii).size()-1).start2 = sss;
+                    cur_state = 3;
                 }
+
             }
         };
         spanString.setSpan(clickSpan2, st, e, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -113,6 +128,9 @@ public class MarkText extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ViewPager vpager_one;
+        ArrayList<View> aList;
+        MyPagerAdapter mAdapter;
         super.onCreate(savedInstanceState);
         LayoutInflater inflate = LayoutInflater.from(this);
         View view;
@@ -122,17 +140,16 @@ public class MarkText extends AppCompatActivity {
         setContentView(R.layout.activity_page);
         vpager_one = findViewById(R.id.vpager_one);
         aList = new ArrayList<>();
-        //aList.add(view);
+        aList.add(view);
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
-      //  for(int i = 0; i<string.size()-1; i++) {
-        int i = 0;
+        for(int i = 0; i<string.size()-1; i++) {
             view = inflate.inflate(R.layout.activity_mark_relation, null);
             aV.add(view);
             textView = view.findViewById(R.id.sentence_text_view);
             showRelation(i);
             aList.add(view);
-        //}
+        }
 
 
         mAdapter = new MyPagerAdapter(aList);
@@ -158,40 +175,66 @@ public class MarkText extends AppCompatActivity {
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
 
+
         textView.setText(string.get(index));
         spanString = new SpannableString(string.get(index));
 
         LayoutInflater inflate = LayoutInflater.from(this);
         View view = inflate.inflate(R.layout.activity_mark_relation,null);
+        mCard.add(new ArrayList<CardList>());
+        final ListView listView = aV.get(index).findViewById(R.id.list_view);
+        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-        final ListView listView = (ListView) aV.get(index).findViewById(R.id.list_view);
+            }
+        };*/
         //List<CardList> mmData = new LinkedList<CardList>();
         //mData.add(mmData);
-
-        FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
+        FloatingActionButton fabBtn = aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                cur_state = 1;
-                CardList cL = new CardList("s","w","w");
-                mCard.add(cL);
-                CardAdapter adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard);
-                listView.setAdapter(adapter);
-                Log.d(TAG, "onClick: " + ss);
-                Log.d(TAG, "onClick: "+sss);
+                if(cur_state==0){
+                    cur_state = 1;
+                    CardList cL = new CardList("s","点击第一个命名实体","点击第二个命名实体");
+                    mCard.get(index).add(cL);
+                    adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
+                    listView.setAdapter(adapter);
+
+
+                }
+
             }
         });
+        if(cur_state==3) {
+            CardView cardView = tmpCard.get(tmpCard.size() - 1).findViewById(R.id.card_choose);
+            cardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (cur_state == 3) {
+                        CardList cL = new CardList("s", ss, sss);
+                        mCard.get(index).remove(mCard.get(index).size() - 1);
+                        mCard.get(index).add(cL);
+                        Log.d(TAG, "onClick: ");
+                        adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(index));
+                        listView.setAdapter(adapter);
+                    }
+                }
+            });
+        }
         final ActionMode.Callback2 textSelectionActionModeCallback;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
         {
+
             textSelectionActionModeCallback = new ActionMode.Callback2() {
                 TextView curTextView = textView;
                 SpannableString curSpanString = spanString;
 
-
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+
 
                     return true;//返回false则不会显示弹窗
                 }
@@ -212,7 +255,7 @@ public class MarkText extends AppCompatActivity {
                     View tmpView;
                     LayoutInflater tmpinflate = LayoutInflater.from(MarkText.this);
 
-                    s = ""+textView.getText();
+                    s = ""+curTextView.getText();
                     switch (menuItem.getItemId()){
                         case R.id.human:
                             int selectionStart = curTextView.getSelectionStart();
@@ -220,7 +263,7 @@ public class MarkText extends AppCompatActivity {
 
 
 
-                            addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, 1);
+                            addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, 1,index);
                             Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();//收起操作菜单
                             /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
@@ -232,7 +275,7 @@ public class MarkText extends AppCompatActivity {
                             selectionEnd = curTextView.getSelectionEnd();
 
 
-                            addBackColorSpan(curTextView,curSpanString,selectionStart,selectionEnd, 2);
+                            addBackColorSpan(curTextView,curSpanString,selectionStart,selectionEnd, 2,index);
                             Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();
                             /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
@@ -274,10 +317,6 @@ public class MarkText extends AppCompatActivity {
         return true;
     }
 
-    public final class ViewHolder{
-        public CardView card;
-    }
-
     class CardList{
         String relation;
         String start1;
@@ -289,17 +328,17 @@ public class MarkText extends AppCompatActivity {
         }
         String getStart1()
         {
-            return this.start1;
+            return  start1;
         }
         String getStart2()
         {
-            return this.start2;
+            return start2;
         }
     }
 
     class CardAdapter extends ArrayAdapter<CardList>{
         private int resourceId;
-
+        public View mview;
         CardAdapter(@NonNull Context context, int resource, @NonNull List<CardList> objects) {
             super(context, resource, objects);
             resourceId = resource;
@@ -311,12 +350,14 @@ public class MarkText extends AppCompatActivity {
             CardList cardList = getItem(position);
             View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
             TextView textView1 = view.findViewById(R.id.cardtext1);
-//            TextView textView1 = view.findViewById(R.id.cardtext1);
-//            TextView textView2 = view.findViewById(R.id.cardtext2);
+            TextView textView2 = view.findViewById(R.id.cardtext2);
             textView1.setText(cardList.getStart1());
-//            textView2.setText(cardList.getStart2());
+            textView2.setText(cardList.getStart2());
+            mview = view;
+            tmpCard.add(mview);
+            Log.d(TAG, "onClick: mv"+adapter.mview);
+            Log.d(TAG, "onClick: size"+tmpCard.size());
             return view;
         }
-
     }
 }

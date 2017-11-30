@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
+    android:clickable="true"
     app:cardBackgroundColor="#74c6aa"
     app:cardCornerRadius="8dp"
     app:cardElevation="5dp">
