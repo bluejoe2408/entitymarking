@@ -44,6 +44,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MarkText extends AppCompatActivity {
     private static final String TAG = "MarkText";
@@ -58,6 +59,7 @@ public class MarkText extends AppCompatActivity {
     private int cur_state = 0;
     private String ss = new String(),sss = new String();
     private String s = new String();
+    String[] colorList={"#FBFFA3", "#CABFAB", "#FEFEA4", "#EAFFD0", "#F9F9F9"};
 
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index) {
 
@@ -171,7 +173,8 @@ public class MarkText extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 cur_state = 1;
-                CardList cL = new CardList("s","w","w");
+                Random random = new Random();
+                CardList cL = new CardList("s","w","w", colorList[random.nextInt(5)]);
                 mCard.add(cL);
                 CardAdapter adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard);
                 listView.setAdapter(adapter);
@@ -223,7 +226,7 @@ public class MarkText extends AppCompatActivity {
                             actionMode.finish();//收起操作菜单
                             /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
                             tmpTextView = tmpView.findViewById(R.id.relation_name);
-                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
+                            tmpTextView.append(curTextView.getString(),selectionStart,selectionEnd);*/
                             break;
                         case R.id.place:
                             selectionStart = curTextView.getSelectionStart();
@@ -235,7 +238,7 @@ public class MarkText extends AppCompatActivity {
                             actionMode.finish();
                             /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
                             tmpTextView = tmpView.findViewById(R.id.relation_name);
-                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
+                            tmpTextView.append(curTextView.getString(),selectionStart,selectionEnd);*/
                             break;
                     }
                     return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
@@ -329,21 +332,13 @@ public class MarkText extends AppCompatActivity {
         String relation;
         String firstEntity;
         String secondEntity;
+        String background;
 
-        CardList(String relation, String firstEntity, String secondEntity){
+        CardList(String relation, String firstEntity, String secondEntity, String background) {
             this.relation = relation;
             this.firstEntity = firstEntity;
             this.secondEntity = secondEntity;
-        }
-
-        String getFirstEntity()
-        {
-            return firstEntity;
-        }
-
-        String getSecondEntity()
-        {
-            return secondEntity;
+            this.background = background;
         }
     }
 
@@ -366,14 +361,16 @@ public class MarkText extends AppCompatActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.firstEntity = view.findViewById(R.id.first_entity);
                 viewHolder.secondEntity = view.findViewById(R.id.second_entity);
+                viewHolder.cardView = view.findViewById(R.id.card_view);
                 view.setTag(viewHolder);
             } else {
                 view = convertView;
                 viewHolder = (ViewHolder) view.getTag();
             }
             if (cardList != null) {
-                viewHolder.firstEntity.setText(cardList.getFirstEntity());
-                viewHolder.secondEntity.setText(cardList.getSecondEntity());
+                viewHolder.firstEntity.setText(cardList.firstEntity);
+                viewHolder.secondEntity.setText(cardList.secondEntity);
+                viewHolder.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
             }
             return view;
         }
@@ -381,6 +378,7 @@ public class MarkText extends AppCompatActivity {
         class ViewHolder {
             TextView firstEntity;
             TextView secondEntity;
+            CardView cardView;
         }
     }
 }
