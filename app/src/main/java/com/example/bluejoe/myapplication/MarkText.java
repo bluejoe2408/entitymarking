@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -22,6 +25,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +37,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-
+import com.weigan.loopview.LoopView;
 public class MarkText extends AppCompatActivity {
     private static final String TAG = "MarkText";
     private TextView textView;
@@ -40,7 +45,8 @@ public class MarkText extends AppCompatActivity {
     private ViewPager vpager_one;
     private ArrayList<View> aList;
     private MyPagerAdapter mAdapter;
-
+    private int cur_state = 0;
+    private String ss,sss;
 
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int s,final int e, int index) {
 
@@ -74,6 +80,7 @@ public class MarkText extends AppCompatActivity {
 
         textView.setText(spanString);
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +182,24 @@ public class MarkText extends AppCompatActivity {
         textView.setText(string.get(index));
         spanString = new SpannableString(string.get(index));
 
+        LayoutInflater inflate = LayoutInflater.from(this);
+        View view;
+        view = inflate.inflate(R.layout.activity_mark_relation,null);
+
+        final ListView listView = (ListView) view.findViewById(R.id.list_view);
+        listView.setAdapter(new ArrayAdapter<CardView>(MarkText.this, R.layout.card_item));
+
+        FloatingActionButton fabBtn = (FloatingActionButton) findViewById(R.id.fabBtn);
+        fabBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater inflate = LayoutInflater.from(MarkText.this);
+                View view;
+                view = inflate.inflate(R.layout.card_item_choose,null);
+
+                //listView.addView(view);
+            }
+        });
         /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         params.setMargins(10,10,10,10);
         textView.setLayoutParams(params);*/
@@ -186,6 +211,7 @@ public class MarkText extends AppCompatActivity {
                 TextView curTextView = textView;
                 SpannableString curSpanString = spanString;
                 CharSequence s = textView.getText();
+
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 
@@ -208,29 +234,38 @@ public class MarkText extends AppCompatActivity {
                     View tmpView;
                     LayoutInflater tmpinflate = LayoutInflater.from(MarkText.this);
 
-                    Log.d(TAG, "onActionItemClicked: ");
+
                     switch (menuItem.getItemId()){
                         case R.id.human:
                             int selectionStart = curTextView.getSelectionStart();
                             int selectionEnd = curTextView.getSelectionEnd();
+
+
+                            tmpView = tmpinflate.inflate(R.layout.card_item,null);
+                            LoopView loopView = (LoopView) tmpView.findViewById(R.id.loopview);
+
+                            ArrayList<String> list = new ArrayList<>();
+                            for(int i = 1; i<10; i++) list.add("item"+i);
+                            loopView.setItems(list);
+
                             addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, 1);
                             Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();//收起操作菜单
-                            tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
+                            /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
                             tmpTextView = tmpView.findViewById(R.id.relation_name);
-                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);
+                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
                             break;
                         case R.id.place:
                             selectionStart = curTextView.getSelectionStart();
                             selectionEnd = curTextView.getSelectionEnd();
-                            Log.d(TAG, "onActionItemClicked: "+selectionStart);
+
 
                             addBackColorSpan(curTextView,curSpanString,selectionStart,selectionEnd, 2);
                             Toast.makeText(MarkText.this, s.subSequence(selectionStart,selectionEnd), Toast.LENGTH_SHORT).show();
                             actionMode.finish();
-                            tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
+                            /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
                             tmpTextView = tmpView.findViewById(R.id.relation_name);
-                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);
+                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
                             break;
                     }
                     return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
