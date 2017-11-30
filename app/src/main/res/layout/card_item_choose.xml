@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <android.support.v7.widget.CardView
+    android:id="@+id/card_choose"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -14,6 +16,7 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
         <TextView
+            android:id="@+id/cardtext1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="4"
@@ -28,15 +31,7 @@
             android:src="@drawable/arrow_left"
             android:contentDescription="@string/实体1"
             />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:background="@drawable/border_bottom"
-            android:text="夫妻"
-            android:maxLines="1" />
+
         <ImageView
             android:layout_width="40sp"
             android:layout_height="40sp"
@@ -44,6 +39,7 @@
             android:contentDescription="@string/实体2"
             />
         <TextView
+            android:id="@+id/cardtext2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="4"
