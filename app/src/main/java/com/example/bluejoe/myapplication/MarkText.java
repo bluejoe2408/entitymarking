@@ -63,16 +63,19 @@ public class MarkText extends AppCompatActivity {
     private List<CardList> mCard = new ArrayList<>();
     private List<String> data = new ArrayList<>();
     private int cur_state = 0;
-    private String ss,sss;
+    private String ss = new String(),sss = new String();
+    private String s = new String();
 
-    private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int s,final int e, int index) {
+    private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index) {
 
         BackgroundColorSpan span;
-        if(index ==1)
-                span = new BackgroundColorSpan(Color.YELLOW);
+        if(index ==1) {
+            span = new BackgroundColorSpan(Color.YELLOW);
+
+        }
           else
                 span = new BackgroundColorSpan(Color.GREEN);
-        spanString.setSpan(span, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         final ClickableSpan clickSpan2 = new ClickableSpan() {
             @Override
@@ -84,15 +87,24 @@ public class MarkText extends AppCompatActivity {
 
             @Override
             public void onClick(View widget) {
+                if(cur_state ==0){
                 Toast.makeText(MarkText.this, "取消成功" , Toast.LENGTH_SHORT).show();
                 BackgroundColorSpan span= new BackgroundColorSpan(Color.TRANSPARENT);
-                spanString.setSpan(span, s, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                 spanString.removeSpan(this);
-                textView.setText(spanString);
+                textView.setText(spanString);}
+                else if(cur_state==1){
+                    ss = (String) s.subSequence(st,e);
+                    cur_state=2;
+                }
+                else if(cur_state==2){
+                    sss = (String) s.subSequence(st,e);
+                    cur_state = 0;
+                }
             }
         };
-        spanString.setSpan(clickSpan2, s, e, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spanString.setSpan(clickSpan2, st, e, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
 
         textView.setText(spanString);
@@ -160,11 +172,13 @@ public class MarkText extends AppCompatActivity {
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                cur_state = 1;
                 CardList cL = new CardList("s","w","w");
                 mCard.add(cL);
                 CardAdapter adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard);
                 listView.setAdapter(adapter);
-                Log.d(TAG, "onClick: " + mCard.size());
+                Log.d(TAG, "onClick: " + ss);
+                Log.d(TAG, "onClick: "+sss);
             }
         });
         final ActionMode.Callback2 textSelectionActionModeCallback;
@@ -174,7 +188,7 @@ public class MarkText extends AppCompatActivity {
             textSelectionActionModeCallback = new ActionMode.Callback2() {
                 TextView curTextView = textView;
                 SpannableString curSpanString = spanString;
-                CharSequence s = textView.getText();
+
 
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -198,7 +212,7 @@ public class MarkText extends AppCompatActivity {
                     View tmpView;
                     LayoutInflater tmpinflate = LayoutInflater.from(MarkText.this);
 
-
+                    s = ""+textView.getText();
                     switch (menuItem.getItemId()){
                         case R.id.human:
                             int selectionStart = curTextView.getSelectionStart();
@@ -219,7 +233,7 @@ public class MarkText extends AppCompatActivity {
 
 
                             addBackColorSpan(curTextView,curSpanString,selectionStart,selectionEnd, 2);
-                            Toast.makeText(MarkText.this, s.subSequence(selectionStart,selectionEnd), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                             actionMode.finish();
                             /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
                             tmpTextView = tmpView.findViewById(R.id.relation_name);
