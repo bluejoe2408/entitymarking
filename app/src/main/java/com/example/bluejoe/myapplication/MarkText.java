@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,8 +29,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,17 +39,12 @@ import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
-import com.weigan.loopview.LoopView;
 public class MarkText extends AppCompatActivity {
     private static final String TAG = "MarkText";
     private TextView textView;
@@ -61,7 +55,6 @@ public class MarkText extends AppCompatActivity {
     private MyPagerAdapter mAdapter;
     private ArrayList<List<CardView>> mData = new ArrayList<List<CardView>>();
     private List<CardList> mCard = new ArrayList<>();
-    private List<String> data = new ArrayList<>();
     private int cur_state = 0;
     private String ss = new String(),sss = new String();
     private String s = new String();
@@ -165,8 +158,13 @@ public class MarkText extends AppCompatActivity {
         View view = inflate.inflate(R.layout.activity_mark_relation,null);
 
         final ListView listView = (ListView) aV.get(index).findViewById(R.id.list_view);
-        //List<CardList> mmData = new LinkedList<CardList>();
-        //mData.add(mmData);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CardList cardList = mCard.get(i);
+                Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
@@ -258,42 +256,94 @@ public class MarkText extends AppCompatActivity {
         }
     }
 
-    public boolean saveJSON(Mention mention) {
+    /**
+     * 将Mention类保存为JSON
+     * @param mention Mention类
+     * @return 布尔值，1表示保存成功
+     */
+    public static boolean saveJSON(Mention mention) {
         Gson gson = new Gson();
         String json = gson.toJson(mention);
-        // Write json to file
-        File file = new File(Environment.getExternalStorageDirectory(), "test.txt");
+        String articleId = mention.getArticleId();
+        // Write JSON to file
+        File dict = new File(Environment.getExternalStorageDirectory(), "entity_marking");
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
         try {
-//            FileOutputStream fos = new FileOutputStream(file);
-            FileOutputStream fos = openFileOutput("data.json", Context.MODE_PRIVATE);
+            if (!dict.exists()) {
+                if (!dict.mkdir()) {
+                    return false;
+                }
+            }
+            FileOutputStream fos = new FileOutputStream(file);
             fos.write(json.getBytes());
             fos.close();
+            Log.d(TAG, "saveJSON: success");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(TAG, "saveJSON: failed");
+            return false;
         }
         return true;
     }
 
-    public final class ViewHolder{
-        public CardView card;
+    /**
+     * 从JSON文件中解析Mention类
+     * @param file File类对象
+     * @return Mention类对象
+     */
+    public static Mention loadJSON(File file) {
+        Gson gson = new Gson();
+        BufferedReader reader = null;
+        Mention mention = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String string;
+            string = reader.readLine();
+            mention = gson.fromJson(string, Mention.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return mention;
+    }
+
+    /**
+     * 检查该文本是否已经过标注
+     * @param string String类型文本内容
+     * @return 布尔值，1表示已经过标注
+     */
+    public static boolean checkJSON(String string){
+        String articleId = Mention.getMD5(string);
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+        return file.exists();
     }
 
     class CardList{
         String relation;
-        String start1;
-        String start2;
-        CardList(String relation, String start1, String start2){
+        String firstEntity;
+        String secondEntity;
+
+        CardList(String relation, String firstEntity, String secondEntity){
             this.relation = relation;
-            this.start1 = start1;
-            this.start2 = start2;
+            this.firstEntity = firstEntity;
+            this.secondEntity = secondEntity;
         }
-        String getStart1()
+
+        String getFirstEntity()
         {
-            return this.start1;
+            return firstEntity;
         }
-        String getStart2()
+
+        String getSecondEntity()
         {
-            return this.start2;
+            return secondEntity;
         }
     }
 
@@ -309,14 +359,28 @@ public class MarkText extends AppCompatActivity {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             CardList cardList = getItem(position);
-            View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
-            TextView textView1 = view.findViewById(R.id.cardtext1);
-//            TextView textView1 = view.findViewById(R.id.cardtext1);
-//            TextView textView2 = view.findViewById(R.id.cardtext2);
-            textView1.setText(cardList.getStart1());
-//            textView2.setText(cardList.getStart2());
+            View view;
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.firstEntity = view.findViewById(R.id.first_entity);
+                viewHolder.secondEntity = view.findViewById(R.id.second_entity);
+                view.setTag(viewHolder);
+            } else {
+                view = convertView;
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            if (cardList != null) {
+                viewHolder.firstEntity.setText(cardList.getFirstEntity());
+                viewHolder.secondEntity.setText(cardList.getSecondEntity());
+            }
             return view;
         }
 
+        class ViewHolder {
+            TextView firstEntity;
+            TextView secondEntity;
+        }
     }
 }
