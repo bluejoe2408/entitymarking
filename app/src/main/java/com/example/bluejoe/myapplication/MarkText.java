@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
@@ -27,7 +29,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,15 +47,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.weigan.loopview.LoopView;
 public class MarkText extends AppCompatActivity {
     private static final String TAG = "MarkText";
     private TextView textView;
     SpannableString spanString;
+    private ArrayList<View> aV = new ArrayList<View>();
     private ViewPager vpager_one;
     private ArrayList<View> aList;
     private MyPagerAdapter mAdapter;
+    private ArrayList<List<CardView>> mData = new ArrayList<List<CardView>>();
+    private List<CardList> mCard = new ArrayList<>();
     private int cur_state = 0;
     private String ss,sss;
 
@@ -100,15 +109,17 @@ public class MarkText extends AppCompatActivity {
         setContentView(R.layout.activity_page);
         vpager_one = findViewById(R.id.vpager_one);
         aList = new ArrayList<>();
-        aList.add(view);
+        //aList.add(view);
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
-        for(int i = 0; i<string.size()-1; i++) {
+      //  for(int i = 0; i<string.size()-1; i++) {
+        int i = 0;
             view = inflate.inflate(R.layout.activity_mark_relation, null);
+            aV.add(view);
             textView = view.findViewById(R.id.sentence_text_view);
             showRelation(i);
             aList.add(view);
-        }
+        //}
 
 
         mAdapter = new MyPagerAdapter(aList);
@@ -156,7 +167,7 @@ public class MarkText extends AppCompatActivity {
 
     }
 
-    public void showRelation(int index) {
+    public void showRelation(final int index) {
         textView.setTextColor(Color.BLACK);
         textView.setBackgroundColor(Color.WHITE);
         textView.setTextSize(18);
@@ -186,6 +197,7 @@ public class MarkText extends AppCompatActivity {
 //        String string = getString(inputStream);
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
+
         textView.setText(string.get(index));
         spanString = new SpannableString(string.get(index));
 
@@ -193,20 +205,29 @@ public class MarkText extends AppCompatActivity {
         View view;
         view = inflate.inflate(R.layout.activity_mark_relation,null);
 
-        final ListView listView = (ListView) view.findViewById(R.id.list_view);
-        listView.setAdapter(new ArrayAdapter<CardView>(MarkText.this, R.layout.card_item));
+        final ListView listView = (ListView) aV.get(index).findViewById(R.id.list_view);
+        //List<CardList> mmData = new LinkedList<CardList>();
+        //mData.add(mmData);
+        CardAdapter adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard);
+        
 
-        FloatingActionButton fabBtn = (FloatingActionButton) findViewById(R.id.fabBtn);
+        listView.setAdapter(adapter);
+
+        FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LayoutInflater inflate = LayoutInflater.from(MarkText.this);
-                View view;
-                view = inflate.inflate(R.layout.card_item_choose,null);
-
-                //listView.addView(view);
+                CardList cL = new CardList("s","w","w");
+                Log.d(TAG, "onClick: 111" + cL.getStart1());
+//                LayoutInflater inflate = LayoutInflater.from(MarkText.this);
+//                View view;
+//                view = inflate.inflate(R.layout.card_item_choose,null);
+//                CardListView  cV = view.findViewById(R.id.card_choose);
+                mCard.add(cL);
+                Log.d(TAG, "onClick: " + mCard.size());
             }
         });
+
         /*LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
         params.setMargins(10,10,10,10);
         textView.setLayoutParams(params);*/
@@ -248,12 +269,6 @@ public class MarkText extends AppCompatActivity {
                             int selectionEnd = curTextView.getSelectionEnd();
 
 
-                            tmpView = tmpinflate.inflate(R.layout.card_item,null);
-                            LoopView loopView = (LoopView) tmpView.findViewById(R.id.loopview);
-
-                            ArrayList<String> list = new ArrayList<>();
-                            for(int i = 1; i<10; i++) list.add("item"+i);
-                            loopView.setItems(list);
 
                             addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, 1);
                             Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
@@ -307,5 +322,49 @@ public class MarkText extends AppCompatActivity {
             e.printStackTrace();
         }
         return true;
+    }
+    public final class ViewHolder{
+        public CardView card;
+    }
+
+
+    class CardList{
+        String relation;
+        String start1;
+        String start2;
+        CardList(String relation,String start1,String start2){
+            this.relation = relation;
+            this.start1 = start1;
+            this.start2 = start2;
+        }
+        String getStart1()
+        {
+            return  start1;
+        }
+        String getStart2()
+        {
+            return start2;
+        }
+    }
+    class CardAdapter extends ArrayAdapter<CardList>{
+        private int resourceId;
+
+        CardAdapter(@NonNull Context context, int resource, @NonNull List<CardList> objects) {
+            super(context, resource, objects);
+            resourceId = resource;
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            CardList cardList = getItem(position);
+            View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+            TextView textView1 = view.findViewById(R.id.cardtext1);
+            TextView textView2 = view.findViewById(R.id.cardtext2);
+            textView1.setText(cardList.getStart1());
+            textView2.setText(cardList.getStart2());
+            return view;
+        }
+
     }
 }
