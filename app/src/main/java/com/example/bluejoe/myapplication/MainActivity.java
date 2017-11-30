@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -24,14 +25,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,31 +45,26 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Gson gson = new Gson();
         Mention mention = new Mention(0, "catdoglovecatdoglovecatdoglove");
         mention.addEntity("cat", "animal", 0);
         mention.addEntity("dog", "animal", 3);
         mention.addRelation(0, 3, "love");
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.addEntity("cat", "animal", 10);
         mention.addEntity("dog", "animal", 13);
         mention.addRelation(10, 13, "love");
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.addEntity("cat", "animal", 20);
         mention.addEntity("dog", "animal", 23);
         mention.addRelation(20, 23, "love");
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.removeRelation(0, 3);
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.removeEntity(10);
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
-        if (saveJSON(mention)) {
+        if (MarkText.saveJSON(mention)) {
             String articleId = mention.getArticleId();
             String sentenceText = mention.getSentenceText();
-            if (checkJSON(sentenceText)) {
+            if (MarkText.checkJSON(sentenceText)) {
                 Log.d(TAG, "onCreate: checkJSON success");
                 File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
-                Mention newMention = loadJSON(file);
+                Mention newMention = MarkText.loadJSON(file);
+                Log.d(TAG, "onCreate: " + Environment.getExternalStorageDirectory());
                 Log.d(TAG, "onCreate: get mention md5 " + newMention.getArticleId());
             }
         }
@@ -107,8 +99,6 @@ public class MainActivity extends Activity {
         button_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, testActivity.class);
-//                startActivity(intent);
 //                Choose a txt file
                 openFileManager();
             }
@@ -216,6 +206,7 @@ public class MainActivity extends Activity {
      * @param uri The Uri to query.
      * @author paulburke
      */
+    @Nullable
     public static String getPath(final Context context, final Uri uri) {
         // DocumentProvider
         if (DocumentsContract.isDocumentUri(context, uri)) {
@@ -283,6 +274,7 @@ public class MainActivity extends Activity {
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
+    @Nullable
     public static String getDataColumn(Context context, Uri uri, String selection,
                                        String[] selectionArgs) {
 
@@ -348,6 +340,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    @NonNull
     public static String getString(InputStream inputStream) {
         InputStreamReader inputStreamReader = null;
         try {
@@ -368,69 +361,5 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         return sb.toString();
-    }
-
-    public boolean saveJSON(Mention mention) {
-        Gson gson = new Gson();
-        String json = gson.toJson(mention);
-        String articleId = mention.getArticleId();
-        // Write json to file
-        File dict = new File(Environment.getExternalStorageDirectory(), "entity_marking");
-        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
-        try {
-            if (!dict.exists()) {
-                if (!dict.mkdir()) {
-                    return false;
-                }
-            }
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(json.getBytes());
-            fos.close();
-            Log.d(TAG, "saveJSON: success");
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(TAG, "saveJSON: failed");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * 从JSON文件中解析Mention类
-     * @param file File类对象
-     * @return Mention类对象
-     */
-    public Mention loadJSON(File file) {
-        Gson gson = new Gson();
-        BufferedReader reader = null;
-        Mention mention = null;
-        try {
-            reader = new BufferedReader(new FileReader(file));
-            String string;
-            string = reader.readLine();
-            mention = gson.fromJson(string, Mention.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return mention;
-    }
-
-    /**
-     * 检查该文本是否已经过标注
-     * @param string String类型文本内容
-     * @return 布尔值，1表示已经过标注
-     */
-    public boolean checkJSON(String string){
-        String articleId = Mention.getMD5(string);
-        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
-        return file.exists();
     }
 }

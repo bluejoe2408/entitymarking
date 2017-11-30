@@ -35,6 +35,8 @@
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
+            app:backgroundTint="#C5F5C2"
+            app:rippleColor="#66A96B"
             app:fabSize="normal"
             android:src="@android:drawable/ic_input_add"/>
     </FrameLayout>
