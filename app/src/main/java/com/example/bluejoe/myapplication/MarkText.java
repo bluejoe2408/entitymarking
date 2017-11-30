@@ -1,10 +1,12 @@
 package com.example.bluejoe.myapplication;
 
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
@@ -30,7 +32,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -284,5 +291,21 @@ public class MarkText extends AppCompatActivity {
             };
             textView.setCustomSelectionActionModeCallback(textSelectionActionModeCallback);
         }
+    }
+
+    public boolean saveJSON(Mention mention) {
+        Gson gson = new Gson();
+        String json = gson.toJson(mention);
+        // Write json to file
+        File file = new File(Environment.getExternalStorageDirectory(), "test.txt");
+        try {
+//            FileOutputStream fos = new FileOutputStream(file);
+            FileOutputStream fos = openFileOutput("data.json", Context.MODE_PRIVATE);
+            fos.write(json.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 }

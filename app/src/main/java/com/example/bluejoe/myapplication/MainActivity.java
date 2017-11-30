@@ -45,10 +45,27 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Gson gson = new Gson();
-        Array array = new Array();
 
-        Log.d(TAG, "onCreate: "+gson.toJson(array));
+        Gson gson = new Gson();
+        Mention mention = new Mention("ebsfbeiukf", 0, "catdoglovecatdoglovecatdoglove");
+        mention.addEntity("cat", "animal", 0);
+        mention.addEntity("dog", "animal", 3);
+        mention.addRelation(0, 3, "love");
+        Log.d(TAG, "onCreate: "+gson.toJson(mention));
+        mention.addEntity("cat", "animal", 10);
+        mention.addEntity("dog", "animal", 13);
+        mention.addRelation(10, 13, "love");
+        Log.d(TAG, "onCreate: "+gson.toJson(mention));
+        mention.addEntity("cat", "animal", 20);
+        mention.addEntity("dog", "animal", 23);
+        mention.addRelation(20, 23, "love");
+        Log.d(TAG, "onCreate: "+gson.toJson(mention));
+        mention.removeRelation(0, 3);
+        Log.d(TAG, "onCreate: "+gson.toJson(mention));
+        mention.removeEntity(10);
+        Log.d(TAG, "onCreate: "+gson.toJson(mention));
+
+
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);
         final TextView title_version = findViewById(R.id.title_version);
@@ -69,7 +86,11 @@ public class MainActivity extends Activity {
         button_start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                button_start.startAnimation(move_btn_start);
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                } else {
+                    button_start.startAnimation(move_btn_start);
+                }
             }
         });
         button_choose.setOnClickListener(new View.OnClickListener() {
@@ -78,11 +99,7 @@ public class MainActivity extends Activity {
 //                Intent intent = new Intent(MainActivity.this, testActivity.class);
 //                startActivity(intent);
 //                Choose a txt file
-                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                } else {
-                    openFileManager();
-                }
+                openFileManager();
             }
         });
         button_default.setOnClickListener(new View.OnClickListener() {
@@ -308,9 +325,11 @@ public class MainActivity extends Activity {
         switch (requestCode) {
             case 1:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openFileManager();
+                    final Button button_start = findViewById(R.id.button_start);
+                    final Animation move_btn_start = AnimationUtils.loadAnimation(this, R.anim.move_btn_start);
+                    button_start.startAnimation(move_btn_start);
                 } else {
-                    Toast.makeText(this, "You denied the permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "请允许App获得权限", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
