@@ -386,22 +386,46 @@ public class MarkText extends AppCompatActivity {
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             CardList cardList = getItem(position);
             View view;
-            ViewHolder viewHolder;
+            ViewHolder viewHolder = new ViewHolder();
+            ViewHolder1 viewHolder1 = new ViewHolder1();
             if (convertView == null) {
+
                 view = LayoutInflater.from(getContext()).inflate(cardList.index, parent, false);
-                viewHolder = new ViewHolder();
-                viewHolder.firstEntity = view.findViewById(R.id.cardtext1);
-                viewHolder.secondEntity = view.findViewById(R.id.cardtext2);
-                viewHolder.cardView = view.findViewById(R.id.card_view);
-                view.setTag(viewHolder);
+                if(cardList.index == R.layout.card_item) {
+                    viewHolder.firstEntity = view.findViewById(R.id.cardtext1);
+                    viewHolder.secondEntity = view.findViewById(R.id.cardtext2);
+                    viewHolder.cardView = view.findViewById(R.id.card_view);
+                    //viewHolder.loopView = view.findViewById(R.id.loopView);
+                    view.setTag(viewHolder);
+                }
+                else{
+                    viewHolder1.firstEntity = view.findViewById(R.id.cardtext1);
+                    viewHolder1.secondEntity = view.findViewById(R.id.cardtext2);
+                    viewHolder1.cardView = view.findViewById(R.id.card_view);
+                    viewHolder1.loopView = view.findViewById(R.id.loopView);
+                    view.setTag(viewHolder1);
+                }
             } else {
                 view = convertView;
                 viewHolder = (ViewHolder) view.getTag();
             }
             if (cardList != null) {
-                viewHolder.firstEntity.setText(cardList.firstEntity);
-                viewHolder.secondEntity.setText(cardList.secondEntity);
-                viewHolder.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
+                if(cardList.index == R.layout.card_item) {
+                    viewHolder.firstEntity.setText(cardList.firstEntity);
+                    viewHolder.secondEntity.setText(cardList.secondEntity);
+                    viewHolder.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
+                }
+                else {
+                    viewHolder1.firstEntity.setText(cardList.firstEntity);
+                    viewHolder1.secondEntity.setText(cardList.secondEntity);
+                    viewHolder1.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
+                    ArrayList<String> list = new ArrayList<>();
+                    list.add("夫妻");
+                    list.add("邻国");
+                    viewHolder1.loopView.setItems(list);
+                    viewHolder1.loopView.setNotLoop();//设置是否循环播放
+                    viewHolder1.loopView.setInitPosition(0);//设置初始位置
+                }
             }
             mview = view;
             tmpCard.add(mview);
@@ -412,6 +436,13 @@ public class MarkText extends AppCompatActivity {
             TextView firstEntity;
             TextView secondEntity;
             CardView cardView;
+            //LoopView loopView;
+        }
+        class ViewHolder1{
+            TextView firstEntity;
+            TextView secondEntity;
+            CardView cardView;
+            LoopView loopView;
         }
     }
 }
