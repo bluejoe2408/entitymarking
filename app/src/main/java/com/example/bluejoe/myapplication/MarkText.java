@@ -436,7 +436,7 @@ public class MarkText extends AppCompatActivity {
                     viewHolder1.loopView.setItems(list);
                     viewHolder1.loopView.setNotLoop();//设置是否循环播放
                     viewHolder1.loopView.setInitPosition(0);//设置初始位置
-                    viewHolder1.loopView.setTextSize(10);
+                    viewHolder1.loopView.setTextSize(20);
                 }
             }
             mview = view;
