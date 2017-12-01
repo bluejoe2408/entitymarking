@@ -62,6 +62,8 @@ public class MarkText extends AppCompatActivity {
     private String ss,sss;
     private String s;
     private CardAdapter adapter;
+    private ArrayList<String> list = new ArrayList<>();
+
 
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index,final int ii) {
 
@@ -96,8 +98,9 @@ public class MarkText extends AppCompatActivity {
                     Log.d(TAG, "onClick: s"+s);
                     ss = (String) s.subSequence(st,e);
                     Log.d(TAG, "onClick: ss"+ss);
-                    Log.d(TAG, "onClick: mv"+adapter.mview);
+                    if(tmpCard.size()!=1) tmpCard.remove(tmpCard.size()-1);
                     TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext1);
+                    Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
                     tmpc.setText(ss);
                     mCard.get(ii).get(mCard.get(ii).size()-1).firstEntity = ss;
                     cur_state=2;
@@ -123,6 +126,8 @@ public class MarkText extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ViewPager vpager_one;
         ArrayList<View> aList;
+        list.add("夫妻");
+        list.add("邻国");
         MyPagerAdapter mAdapter;
         super.onCreate(savedInstanceState);
         LayoutInflater inflate = LayoutInflater.from(this);
@@ -183,8 +188,11 @@ public class MarkText extends AppCompatActivity {
                 if(cur_state==3) {
                     CardView cardView = tmpCard.get(tmpCard.size() - 1).findViewById(R.id.card_view);
                     Random random = new Random();
-                    CardList cL = new CardList("s",ss,sss, colorList[random.nextInt(5)], R.layout.card_item);
+                    LoopView loopView =tmpCard.get(tmpCard.size() - 1).findViewById(R.id.loopView);
+                    //Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
+                    CardList cL = new CardList(list.get(loopView.getSelectedItem()),ss,sss, colorList[random.nextInt(5)], R.layout.card_item);
                     mCard.get(index).remove(mCard.get(index).size() - 1);
+                    tmpCard.remove(tmpCard.size()-1);
                     mCard.get(index).add(cL);
                     Log.d(TAG, "onClick: ");
                     adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(index));
@@ -206,8 +214,11 @@ public class MarkText extends AppCompatActivity {
                     Random random = new Random();
                     CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose);
                     mCard.get(index).add(cL);
+
                     adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
+                    Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
                     listView.setAdapter(adapter);
+                    listView.setSelection(mCard.size()-1);
                 }
 
             }
@@ -395,6 +406,7 @@ public class MarkText extends AppCompatActivity {
                     viewHolder.firstEntity = view.findViewById(R.id.cardtext1);
                     viewHolder.secondEntity = view.findViewById(R.id.cardtext2);
                     viewHolder.cardView = view.findViewById(R.id.card_view);
+                    viewHolder.relation = view.findViewById(R.id.cardrelation);
                     //viewHolder.loopView = view.findViewById(R.id.loopView);
                     view.setTag(viewHolder);
                 }
@@ -414,21 +426,22 @@ public class MarkText extends AppCompatActivity {
                     viewHolder.firstEntity.setText(cardList.firstEntity);
                     viewHolder.secondEntity.setText(cardList.secondEntity);
                     viewHolder.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
+                    viewHolder.relation.setText(cardList.relation);
                 }
                 else {
                     viewHolder1.firstEntity.setText(cardList.firstEntity);
                     viewHolder1.secondEntity.setText(cardList.secondEntity);
                     viewHolder1.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
-                    ArrayList<String> list = new ArrayList<>();
-                    list.add("夫妻");
-                    list.add("邻国");
+
                     viewHolder1.loopView.setItems(list);
                     viewHolder1.loopView.setNotLoop();//设置是否循环播放
                     viewHolder1.loopView.setInitPosition(0);//设置初始位置
+                    viewHolder1.loopView.setTextSize(10);
                 }
             }
             mview = view;
             tmpCard.add(mview);
+
             return view;
         }
 
@@ -436,6 +449,7 @@ public class MarkText extends AppCompatActivity {
             TextView firstEntity;
             TextView secondEntity;
             CardView cardView;
+            TextView relation;
             //LoopView loopView;
         }
         class ViewHolder1{
