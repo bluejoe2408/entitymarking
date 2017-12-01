@@ -1,57 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    app:cardBackgroundColor="#74c6aa"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="5dp">
 
-    <LinearLayout
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:background="@drawable/border_bottom"
-            android:text="习近平"
-            android:maxLines="1"/>
-        <ImageView
-            android:layout_width="40sp"
-            android:layout_height="40sp"
-            android:src="@drawable/arrow_left"
-            android:contentDescription="@string/实体1"
-            />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:background="@drawable/border_bottom"
-            android:text="夫妻"
-            android:maxLines="1" />
-        <ImageView
-            android:layout_width="40sp"
-            android:layout_height="40sp"
-            android:src="@drawable/arrow_right"
-            android:contentDescription="@string/实体2"
-            />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="4"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:background="@drawable/border_bottom"
-            android:text="彭丽媛"
-            android:maxLines="1" />
+        android:layout_height="wrap_content">
 
-    </LinearLayout>
-</android.support.v7.widget.CardView >
+        <android.support.v7.widget.CardView
+            android:id="@+id/card_view"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:cardBackgroundColor="#FBFFA3"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp">
+                <TextView
+                    android:id="@+id/cardtext1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:background="@drawable/border_bottom"
+                    android:maxLines="1"
+                    android:textSize="20sp"
+                    android:textColor="#0D625E"/>
+                <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:src="@drawable/arrow_left"
+                    android:contentDescription="@string/实体1"
+                    />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:background="@drawable/border_bottom"
+                    android:text="夫妻"
+                    android:maxLines="1" />
+
+                <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:src="@drawable/arrow_right"
+                    android:contentDescription="@string/实体2"
+                    />
+                <TextView
+                    android:id="@+id/cardtext2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:background="@drawable/border_bottom"
+                    android:maxLines="1"
+                    android:textSize="20sp"
+                    android:textColor="#0D625E"/>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView >
+        </FrameLayout>

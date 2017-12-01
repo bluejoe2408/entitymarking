@@ -19,10 +19,10 @@
             android:layout_height="wrap_content"
             android:padding="8dp">
             <TextView
-                android:id="@+id/first_entity"
+                android:id="@+id/cardtext1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="4"
+                android:layout_weight="2"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:background="@drawable/border_bottom"
@@ -35,7 +35,11 @@
                 android:src="@drawable/arrow_left"
                 android:contentDescription="@string/实体1"
                 />
-
+           <com.weigan.loopview.LoopView
+                android:id="@+id/loopView"
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+            />
             <ImageView
                 android:layout_width="40sp"
                 android:layout_height="40sp"
@@ -43,10 +47,10 @@
                 android:contentDescription="@string/实体2"
                 />
             <TextView
-                android:id="@+id/second_entity"
+                android:id="@+id/cardtext2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="4"
+                android:layout_weight="2"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:background="@drawable/border_bottom"
