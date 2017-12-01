@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Random;
 
 public class MarkText extends AppCompatActivity {
-    public ArrayList<Mention> mentionArray;
+    public ArrayList<Mention> mentionArray = new ArrayList<>();
     private static final String TAG = "MarkText";
     public static final int TEXT_SIZE_MIN = 40;
     public static final int TEXT_SIZE_MAX = 70;
@@ -67,6 +67,7 @@ public class MarkText extends AppCompatActivity {
     private ArrayList<View> tmpCard = new ArrayList<>();
     private int cur_state = 0;
     private String ss,sss;
+    private int st1,st2;
     private String s;
     private CardAdapter adapter;
     String[] colorList={"#FBFFA3", "#CABFAB", "#E97A7A", "#EAFFD0", "#F9F9F9"};
@@ -102,10 +103,12 @@ public class MarkText extends AppCompatActivity {
         BackgroundColorSpan span;
         if(index ==1) {
             span = new BackgroundColorSpan(Color.YELLOW);
-
+            mentionArray.get(ii).addEntity(s.substring(st,e),"human",st);
         }
-          else
-                span = new BackgroundColorSpan(Color.GREEN);
+          else {
+            span = new BackgroundColorSpan(Color.GREEN);
+            mentionArray.get(ii).addEntity(s.substring(st,e),"human",st);
+        }
         spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
         final ClickableSpan clickSpan2 = new ClickableSpan() {
@@ -126,22 +129,22 @@ public class MarkText extends AppCompatActivity {
                 spanString.removeSpan(this);
                 textView.setText(spanString);}
                 else if(cur_state==1){
-
-                    Log.d(TAG, "onClick: s"+s);
+                    st1 = st;
                     ss = (String) s.subSequence(st,e);
                     Log.d(TAG, "onClick: ss"+ss);
-                    if(tmpCard.size()!=1) tmpCard.remove(tmpCard.size()-1);
+
 //                    Log.d(TAG, "onClick: mv"+adapter.mview);
-                    TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext1);
+                    TextView tmpc  =tmpCard.get(0).findViewById(R.id.cardtext1);
                     Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
                     tmpc.setText(ss);
                     mCard.get(ii).get(mCard.get(ii).size()-1).firstEntity = ss;
                     cur_state=2;
                 }
                 else if(cur_state==2){
+                    st2 = st;
                     sss = (String) s.subSequence(st,e);
                     Log.d(TAG, "onClick: sss"+sss);
-                    TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext2);
+                    TextView tmpc  =tmpCard.get(0).findViewById(R.id.cardtext2);
                     tmpc.setText(sss);
                     mCard.get(ii).get(mCard.get(ii).size()-1).secondEntity = sss;
                     cur_state = 3;
@@ -177,6 +180,7 @@ public class MarkText extends AppCompatActivity {
             @Override
             public void run() {
                 for(int i = 0; i < string.size() - 1; i++) {
+                    mentionArray.add(new Mention(i,(String)string.get(i)));
                     doALotThings(i);
                     Bundle bundle = new Bundle();
                     bundle.putString("text", string.get(i).toString());
@@ -194,6 +198,7 @@ public class MarkText extends AppCompatActivity {
     }
 
     private void doALotThings(int i) {
+
         view = inflate.inflate(R.layout.activity_mark_relation, null);
         aV.add(view);
         textView = view.findViewById(R.id.sentence_text_view);
@@ -258,18 +263,21 @@ public class MarkText extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 CardList cardList = mCard.get(index).get(i);
                 if(cur_state==3) {
-                    CardView cardView = tmpCard.get(tmpCard.size() - 1).findViewById(R.id.card_view);
+                    CardView cardView = tmpCard.get(0).findViewById(R.id.card_view);
                     Random random = new Random();
-                    LoopView loopView =tmpCard.get(tmpCard.size() - 1).findViewById(R.id.loopView);
+                    LoopView loopView =tmpCard.get(0).findViewById(R.id.loopView);
                     //Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
                     CardList cL = new CardList(list.get(loopView.getSelectedItem()),ss,sss, colorList[random.nextInt(5)], R.layout.card_item);
                     mCard.get(index).remove(mCard.get(index).size() - 1);
-                    tmpCard.remove(tmpCard.size()-1);
                     mCard.get(index).add(cL);
-                    Log.d(TAG, "onClick: ");
+                    mentionArray.get(index).addRelation(st1,st2,list.get(loopView.getSelectedItem()));
+                    //Log.d(TAG, "onClick: ");
                     adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(index));
                     listView.setAdapter(adapter);
                     cur_state = 0;
+
+                    saveJSON(mentionArray.get(index));
+                    listView.setSelection(mCard.size()-1);
                 }
                 else Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
             }
@@ -284,13 +292,30 @@ public class MarkText extends AppCompatActivity {
                     Random random = new Random();
                     CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose);
                     mCard.get(index).add(cL);
-
+                    tmpCard.clear();
                     adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
                     Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
                     listView.setAdapter(adapter);
                     listView.setSelection(mCard.size()-1);
                 }
 
+            }
+        });
+        fabBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(cur_state==0){
+                    cur_state = 1;
+                    Random random = new Random();
+                    CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose);
+                    mCard.get(index).add(cL);
+
+                    adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
+                    Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
+                    listView.setAdapter(adapter);
+                    listView.setSelection(mCard.size()-1);
+                }
+                return true;
             }
         });
         final ActionMode.Callback2 textSelectionActionModeCallback;
@@ -390,6 +415,7 @@ public class MarkText extends AppCompatActivity {
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(json.getBytes());
             fos.close();
+            Log.d(TAG, "JSON"+json);
             Log.d(TAG, "saveJSON: success");
         } catch (IOException e) {
             e.printStackTrace();
@@ -466,6 +492,7 @@ public class MarkText extends AppCompatActivity {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             CardList cardList = getItem(position);
+            Log.d(TAG, "getView: pos"+position);
             View view;
             ViewHolder viewHolder = new ViewHolder();
             ViewHolder1 viewHolder1 = new ViewHolder1();
@@ -511,7 +538,7 @@ public class MarkText extends AppCompatActivity {
             }
             mview = view;
             tmpCard.add(mview);
-
+            Log.d(TAG, "getView: mview"+mview);
             return view;
         }
 
