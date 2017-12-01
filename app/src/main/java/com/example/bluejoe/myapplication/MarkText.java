@@ -1,5 +1,6 @@
 package com.example.bluejoe.myapplication;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,8 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -55,6 +58,7 @@ public class MarkText extends AppCompatActivity {
     public static final int TEXT_SIZE_MIN = 40;
     public static final int TEXT_SIZE_MAX = 70;
     public static final int TEXT_SIZE_STEP = 3;
+    public static final int UPDATE_UI = 1;
     private TextView textView;
     SpannableString spanString;
     private ArrayList<View> aV = new ArrayList<>();
@@ -67,7 +71,31 @@ public class MarkText extends AppCompatActivity {
     private CardAdapter adapter;
     String[] colorList={"#FBFFA3", "#CABFAB", "#E97A7A", "#EAFFD0", "#F9F9F9"};
     private ArrayList<String> list = new ArrayList<>();
+    private List<Button> btnSmallerList = new ArrayList<>();
+    private List<Button> btnLargerList = new ArrayList<>();
+    private List<TextView> textViewList = new ArrayList<>();
+    private View view;
+    private LayoutInflater inflate;
+    private ArrayList<View> aList;
+    private MyPagerAdapter mAdapter = null;
 
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case UPDATE_UI:
+                    textView.setTextColor(Color.BLACK);
+                    textView.setBackgroundColor(Color.WHITE);
+                    textView.setTextSize(18);
+                    textView.setMovementMethod(LinkMovementMethod.getInstance());
+                    textView.setText(msg.getData().getString("text"));
+                    mAdapter.notifyDataSetChanged();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index,final int ii) {
 
@@ -131,12 +159,10 @@ public class MarkText extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ViewPager vpager_one;
-        ArrayList<View> aList;
         list.add("夫妻");
         list.add("邻国");
-        MyPagerAdapter mAdapter;
-        LayoutInflater inflate = LayoutInflater.from(this);
-        View view = inflate.inflate(R.layout.activity_mark_text,null);
+        inflate = LayoutInflater.from(this);
+        view = inflate.inflate(R.layout.activity_mark_text,null);
         textView = view.findViewById(R.id.text_view);
         showText();
         setContentView(R.layout.activity_page);
@@ -147,45 +173,63 @@ public class MarkText extends AppCompatActivity {
         String type = intent.getStringExtra("type");
         // TODO: Switch（type）Mention mention = (Mention) intent.getSerializableExtra("mention");
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
-        for(int i = 0; i < string.size() - 1; i++) {
-            view = inflate.inflate(R.layout.activity_mark_relation, null);
-            aV.add(view);
-            textView = view.findViewById(R.id.sentence_text_view);
-            Button text_smaller = view.findViewById(R.id.text_smaller);
-            Button text_larger = view.findViewById(R.id.text_larger);
-            showRelation(i);
-            aList.add(view);
-
-            text_smaller.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    float textSize = textView.getTextSize();
-                    Log.d(TAG, "onClick: " + textSize);
-                    if (textSize > TEXT_SIZE_MIN) {
-                        textSize -= TEXT_SIZE_STEP;
-                        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-                        Toast.makeText(MarkText.this, "减小字号(´・ω・｀)", Toast.LENGTH_SHORT).show();
-                    }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for(int i = 0; i < string.size() - 1; i++) {
+                    doALotThings(i);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("text", string.get(i).toString());
+                    Message message = new Message();
+                    message.what = UPDATE_UI;
+                    message.setData(bundle);
+                    handler.sendMessage(message);
+                    Log.d(TAG, "run: " + i + " finished.");
                 }
-            });
-
-            text_larger.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    float textSize = textView.getTextSize();
-                    Log.d(TAG, "onClick: " + textSize);
-                    if (textSize < TEXT_SIZE_MAX) {
-                        textSize += TEXT_SIZE_STEP;
-                        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-                        Toast.makeText(MarkText.this, "增大字号(´・ω・｀)", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-
+            }
+        }).start();
 
         mAdapter = new MyPagerAdapter(aList);
         vpager_one.setAdapter(mAdapter);
+    }
+
+    private void doALotThings(int i) {
+        view = inflate.inflate(R.layout.activity_mark_relation, null);
+        aV.add(view);
+        textView = view.findViewById(R.id.sentence_text_view);
+        textViewList.add((TextView) view.findViewById(R.id.sentence_text_view));
+        btnSmallerList.add((Button) view.findViewById(R.id.text_smaller));
+        btnLargerList.add((Button) view.findViewById(R.id.text_larger));
+        showRelation(i);
+        aList.add(view);
+
+        btnSmallerList.get(i).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                float textSize = textViewList.get(textViewList.size() - 1).getTextSize();
+                if (textSize > TEXT_SIZE_MIN) {
+                    textSize -= TEXT_SIZE_STEP;
+                    for (int i = 0; i < textViewList.size(); i++) {
+                        textViewList.get(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                    }
+                    Toast.makeText(MarkText.this, "减小字号(´・ω・｀)", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnLargerList.get(i).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                float textSize = textViewList.get(textViewList.size() - 1).getTextSize();
+                if (textSize < TEXT_SIZE_MAX) {
+                    textSize += TEXT_SIZE_STEP;
+                    for (int i = 0; i < textViewList.size(); i++) {
+                        textViewList.get(i).setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                    }
+                    Toast.makeText(MarkText.this, "增大字号(´・ω・｀)", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void showText() {
@@ -199,14 +243,9 @@ public class MarkText extends AppCompatActivity {
         spanString = new SpannableString(string.get(string.size()-1));
     }
 
-    public void showRelation(final int index) {
-        textView.setTextColor(Color.BLACK);
-        textView.setBackgroundColor(Color.WHITE);
-        textView.setTextSize(18);
-        textView.setMovementMethod(LinkMovementMethod.getInstance());
+    public void  showRelation(final int index) {
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
-        textView.setText(string.get(index));
         spanString = new SpannableString(string.get(index));
 
         LayoutInflater inflate = LayoutInflater.from(this);
@@ -235,8 +274,6 @@ public class MarkText extends AppCompatActivity {
                 else Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
             }
         });
-
-
 
         FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
