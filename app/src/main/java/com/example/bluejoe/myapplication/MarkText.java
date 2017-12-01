@@ -99,7 +99,7 @@ public class MarkText extends AppCompatActivity {
                     Log.d(TAG, "onClick: mv"+adapter.mview);
                     TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext1);
                     tmpc.setText(ss);
-                    mCard.get(ii).get(mCard.get(ii).size()-1).start1 = ss;
+                    mCard.get(ii).get(mCard.get(ii).size()-1).firstEntity = ss;
                     cur_state=2;
                 }
                 else if(cur_state==2){
@@ -107,7 +107,7 @@ public class MarkText extends AppCompatActivity {
                     Log.d(TAG, "onClick: sss"+sss);
                     TextView tmpc  =tmpCard.get(tmpCard.size()-1).findViewById(R.id.cardtext2);
                     tmpc.setText(sss);
-                    mCard.get(ii).get(mCard.get(ii).size()-1).start2 = sss;
+                    mCard.get(ii).get(mCard.get(ii).size()-1).secondEntity = sss;
                     cur_state = 3;
                 }
             }
@@ -174,19 +174,28 @@ public class MarkText extends AppCompatActivity {
         LayoutInflater inflate = LayoutInflater.from(this);
         View view = inflate.inflate(R.layout.activity_mark_relation,null);
         mCard.add(new ArrayList<CardList>());
-        final ListView listView = aV.get(index).findViewById(R.id.list_view);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
         final ListView listView = (ListView) aV.get(index).findViewById(R.id.list_view);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CardList cardList = mCard.get(i);
-                Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
+                CardList cardList = mCard.get(index).get(i);
+                if(cur_state==3) {
+                    CardView cardView = tmpCard.get(tmpCard.size() - 1).findViewById(R.id.card_view);
+                    Random random = new Random();
+                    CardList cL = new CardList("s",ss,sss, colorList[random.nextInt(5)], R.layout.card_item);
+                    mCard.get(index).remove(mCard.get(index).size() - 1);
+                    mCard.get(index).add(cL);
+                    Log.d(TAG, "onClick: ");
+                    adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(index));
+                    listView.setAdapter(adapter);
+                    cur_state = 0;
+                }
+                else Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
         FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
@@ -194,32 +203,15 @@ public class MarkText extends AppCompatActivity {
             public void onClick(View v) {
                 if(cur_state==0){
                     cur_state = 1;
-                    CardList cL = new CardList("s","点击第一个命名实体","点击第二个命名实体");
+                    Random random = new Random();
+                    CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose);
                     mCard.get(index).add(cL);
                     adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
                     listView.setAdapter(adapter);
-
-
                 }
 
             }
         });
-        if(cur_state==3) {
-            CardView cardView = tmpCard.get(tmpCard.size() - 1).findViewById(R.id.card_choose);
-            cardView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (cur_state == 3) {
-                        CardList cL = new CardList("s", ss, sss);
-                        mCard.get(index).remove(mCard.get(index).size() - 1);
-                        mCard.get(index).add(cL);
-                        Log.d(TAG, "onClick: ");
-                        adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(index));
-                        listView.setAdapter(adapter);
-                    }
-                }
-            });
-        }
         final ActionMode.Callback2 textSelectionActionModeCallback;
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
@@ -370,12 +362,14 @@ public class MarkText extends AppCompatActivity {
         String firstEntity;
         String secondEntity;
         String background;
+        int index;
 
-        CardList(String relation, String firstEntity, String secondEntity, String background) {
+        CardList(String relation, String firstEntity, String secondEntity, String background, int index) {
             this.relation = relation;
             this.firstEntity = firstEntity;
             this.secondEntity = secondEntity;
             this.background = background;
+            this.index = index;
         }
     }
 
@@ -394,10 +388,10 @@ public class MarkText extends AppCompatActivity {
             View view;
             ViewHolder viewHolder;
             if (convertView == null) {
-                view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+                view = LayoutInflater.from(getContext()).inflate(cardList.index, parent, false);
                 viewHolder = new ViewHolder();
-                viewHolder.firstEntity = view.findViewById(R.id.first_entity);
-                viewHolder.secondEntity = view.findViewById(R.id.second_entity);
+                viewHolder.firstEntity = view.findViewById(R.id.cardtext1);
+                viewHolder.secondEntity = view.findViewById(R.id.cardtext2);
                 viewHolder.cardView = view.findViewById(R.id.card_view);
                 view.setTag(viewHolder);
             } else {
@@ -409,15 +403,8 @@ public class MarkText extends AppCompatActivity {
                 viewHolder.secondEntity.setText(cardList.secondEntity);
                 viewHolder.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
             }
-            View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
-            TextView textView1 = view.findViewById(R.id.cardtext1);
-            TextView textView2 = view.findViewById(R.id.cardtext2);
-            textView1.setText(cardList.getStart1());
-            textView2.setText(cardList.getStart2());
             mview = view;
             tmpCard.add(mview);
-            Log.d(TAG, "onClick: mv"+adapter.mview);
-            Log.d(TAG, "onClick: size"+tmpCard.size());
             return view;
         }
 
