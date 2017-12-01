@@ -171,7 +171,7 @@ public class MarkText extends AppCompatActivity {
         aList.add(view);
         Intent intent = getIntent();
         String type = intent.getStringExtra("type");
-        // TODO: Switch（type）Mention mention = (Mention) intent.getSerializableExtra("mention");
+        // TODO: Switch（type）Mention mention = (Mention) intentZ.getSerializableExtra("mention");
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
         new Thread(new Runnable() {
             @Override
@@ -378,9 +378,11 @@ public class MarkText extends AppCompatActivity {
         Gson gson = new Gson();
         String json = gson.toJson(mention);
         String articleId = mention.getArticleId();
+        int sentenceId = mention.getSentenceId();
         // Write JSON to file
         File dict = new File(Environment.getExternalStorageDirectory(), "entity_marking");
-        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/"
+                + articleId + "_" + sentenceId + ".json");
         try {
             if (!dict.exists()) {
                 if (!dict.mkdir()) {
@@ -430,12 +432,17 @@ public class MarkText extends AppCompatActivity {
     /**
      * 检查该文本是否已经过标注
      * @param string String类型文本内容
-     * @return 布尔值，1表示已经过标注
+     * @return 标注句数，0表示未标注
      */
-    public static boolean checkJSON(String string){
+    public static int checkJSON(String string){
         String articleId = Mention.getMD5(string);
-        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
-        return file.exists();
+        int i = 0;
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
+        while (file.exists()) {
+            i++;
+            file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
+        }
+        return i;
     }
 
     class CardList{

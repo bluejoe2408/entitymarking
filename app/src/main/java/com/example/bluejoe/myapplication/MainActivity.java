@@ -26,14 +26,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.Externalizable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 public class MainActivity extends Activity {
@@ -41,6 +47,7 @@ public class MainActivity extends Activity {
     private static final int FILE_SELECT_CODE = 1;
 
     private static final String TAG = "MainActivity";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +68,7 @@ public class MainActivity extends Activity {
         if (MarkText.saveJSON(mention)) {
             String articleId = mention.getArticleId();
             String sentenceText = mention.getSentenceText();
-            if (MarkText.checkJSON(sentenceText)) {
+            if (MarkText.checkJSON(sentenceText) > 0) {
                 Log.d(TAG, "onCreate: checkJSON success");
                 File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
                 Mention newMention = MarkText.loadJSON(file);
@@ -157,7 +164,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent("android.intent.action.GET_CONTENT");
         intent.setType("*/*");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult( intent, FILE_SELECT_CODE);
+        startActivityForResult(intent, FILE_SELECT_CODE);
     }
 
     @Override
@@ -189,20 +196,23 @@ public class MainActivity extends Activity {
                                 e.printStackTrace();
                                 Toast.makeText(this, "读取文件失败", Toast.LENGTH_SHORT).show();
                             }
-//                            String string = "";
-//                            try {
-//                                FileInputStream inputStream = new FileInputStream(file);
-//                                string = getString(inputStream);
-//                            } catch (FileNotFoundException e) {
-//                                e.printStackTrace();
-//                            }
                             break;
                         }
                         case ".json": {
-                            Mention mention = MarkText.loadJSON(file);
+//                            List<Mention> mentionList = new ArrayList<>();
+                            String articleId = fName.substring(0, 31);
                             Intent intent = new Intent(MainActivity.this, MarkText.class);
+                            int i = 0;
+                            File jsonFile = new File(path.substring(0, path.length() - fName.length()) + articleId + "_" + i + ".json");
+                            while (jsonFile.exists()) {
+                                Mention mention = MarkText.loadJSON(jsonFile);
+                                intent.putExtra("mention" + i, mention);
+//                                mentionList.add(MarkText.loadJSON(jsonFile));
+                                i++;
+                                jsonFile = new File(path.substring(0, path.length() - fName.length()) + articleId + "_" + i + ".json");
+                            }
                             intent.putExtra("type", "json");
-                            intent.putExtra("mention", mention);
+                            intent.putExtra("num", i);
                             startActivity(intent);
                             break;
                         }
@@ -213,7 +223,7 @@ public class MainActivity extends Activity {
                 }
                 break;
             default:
-                Toast.makeText(this, "请选择一个文件",  Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "请选择一个文件", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -224,7 +234,7 @@ public class MainActivity extends Activity {
      * other file-based ContentProviders.
      *
      * @param context The context.
-     * @param uri The Uri to query.
+     * @param uri     The Uri to query.
      * @author paulburke
      */
     @Nullable
@@ -266,7 +276,7 @@ public class MainActivity extends Activity {
                 }
 
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
+                final String[] selectionArgs = new String[]{
                         split[1]
                 };
 
@@ -289,9 +299,9 @@ public class MainActivity extends Activity {
      * Get the value of the data column for this Uri. This is useful for
      * MediaStore Uris, and other file-based ContentProviders.
      *
-     * @param context The context.
-     * @param uri The Uri to query.
-     * @param selection (Optional) Filter used in the query.
+     * @param context       The context.
+     * @param uri           The Uri to query.
+     * @param selection     (Optional) Filter used in the query.
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */

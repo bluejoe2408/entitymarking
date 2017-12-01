@@ -99,26 +99,10 @@ public class ChooseText extends AppCompatActivity {
     }
 
     private void initTextList() {
-        TextList sample0 = new TextList("texts/t0.txt");
-        textList.add(sample0);
-        TextList sample1 = new TextList("texts/t1.txt");
-        textList.add(sample1);
-        TextList sample2 = new TextList("texts/t2.txt");
-        textList.add(sample2);
-        TextList sample3 = new TextList("texts/t3.txt");
-        textList.add(sample3);
-        TextList sample4 = new TextList("texts/t4.txt");
-        textList.add(sample4);
-        TextList sample5 = new TextList("texts/t5.txt");
-        textList.add(sample5);
-        TextList sample6 = new TextList("texts/t6.txt");
-        textList.add(sample6);
-        TextList sample7 = new TextList("texts/t7.txt");
-        textList.add(sample7);
-        TextList sample8 = new TextList("texts/t8.txt");
-        textList.add(sample8);
-        TextList sample9 = new TextList("texts/t9.txt");
-        textList.add(sample9);
+        for (int i = 0; i < 10; i++) {
+            TextList sample = new TextList("texts/t" + i + ".txt");
+            textList.add(sample);
+        }
     }
 
     public void writeDefaultFile() {
@@ -138,7 +122,7 @@ public class ChooseText extends AppCompatActivity {
 
         private String content;
         private String filename;
-        private boolean mentioned;
+        private int mentioned;
 
         TextList(String filename) {
             this.content = getString(filename);
@@ -154,7 +138,7 @@ public class ChooseText extends AppCompatActivity {
             return filename;
         }
 
-        boolean isMentioned() {
+        int isMentioned() {
             return mentioned;
         }
     }
@@ -186,8 +170,9 @@ public class ChooseText extends AppCompatActivity {
             }
             assert textList != null;
             viewHolder.textName.setText(textList.getContent());
-            if (textList.isMentioned()) {
-                viewHolder.textMentioned.setText(R.string.is_mentioned);
+            int mentioned = textList.isMentioned();
+            if (mentioned > 0) {
+                viewHolder.textMentioned.setText("已标注" + mentioned + "句");
                 viewHolder.textMentioned.setTextColor(Color.parseColor("#88B990"));
             } else {
                 viewHolder.textMentioned.setText(R.string.not_mentioned);
