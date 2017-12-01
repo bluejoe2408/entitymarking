@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 
 public class MainActivity extends Activity {
@@ -175,19 +176,39 @@ public class MainActivity extends Activity {
                     // Get extension
                     String end = fName.substring(fName.lastIndexOf("."),
                             fName.length()).toLowerCase();
-                    if (end.equals(".txt")) {
-                        String string = "";
-                        try {
-                            FileInputStream inputStream = new FileInputStream(file);
-                            string = getString(inputStream);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
+                    switch (end) {
+                        case ".txt": {
+                            try {
+                                InputStream inputStream = new FileInputStream(file);
+                                ArrayList<CharSequence> string = ChooseText.splitText(inputStream);
+                                Intent intent = new Intent(MainActivity.this, MarkText.class);
+                                intent.putExtra("type", "text");
+                                intent.putExtra("string", string);
+                                startActivity(intent);
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                                Toast.makeText(this, "读取文件失败", Toast.LENGTH_SHORT).show();
+                            }
+//                            String string = "";
+//                            try {
+//                                FileInputStream inputStream = new FileInputStream(file);
+//                                string = getString(inputStream);
+//                            } catch (FileNotFoundException e) {
+//                                e.printStackTrace();
+//                            }
+                            break;
                         }
-                        Intent intent = new Intent(MainActivity.this, MarkText.class);
-                        intent.putExtra("string", string);
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(this, "请选择文本类型的文件（*.txt）",  Toast.LENGTH_SHORT).show();
+                        case ".json": {
+                            Mention mention = MarkText.loadJSON(file);
+                            Intent intent = new Intent(MainActivity.this, MarkText.class);
+                            intent.putExtra("type", "json");
+                            intent.putExtra("mention", mention);
+                            startActivity(intent);
+                            break;
+                        }
+                        default:
+                            Toast.makeText(this, "请选择文本或JSON格式的文件（*.txt|*.json）", Toast.LENGTH_SHORT).show();
+                            break;
                     }
                 }
                 break;

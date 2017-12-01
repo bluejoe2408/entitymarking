@@ -124,6 +124,8 @@ public class MarkText extends AppCompatActivity {
         aList = new ArrayList<>();
         //aList.add(view);
         Intent intent = getIntent();
+        String type = intent.getStringExtra("type");
+        // TODO: Switch（type）Mention mention = (Mention) intent.getSerializableExtra("mention");
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
       //  for(int i = 0; i<string.size()-1; i++) {
         int i = 0;

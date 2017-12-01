@@ -1,5 +1,6 @@
 package com.example.bluejoe.myapplication;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 
@@ -9,7 +10,7 @@ import java.util.ArrayList;
  * 包含原文本ID、本句ID、本句文本和ArrayList，用于存放命名实体的标注内容和实体关系的标注内容
  */
 
-class Mention {
+class Mention implements Serializable {
     private String articleId;
     private int sentenceId;
     private String sentenceText;
