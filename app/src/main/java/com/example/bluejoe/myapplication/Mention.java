@@ -136,6 +136,16 @@ class Mention implements Serializable {
         return relationMentions;
     }
 
+    String getEntityByIndex(int startIndex){
+        String entity = new String();
+        for(int i = 0; i<entityMentions.size(); i++)
+            if(entityMentions.get(i).getStartIndex()==startIndex){
+                entity = entityMentions.get(i).getEntity();
+                break;
+            }
+        return entity;
+    }
+
     static String getMD5(String message) {
         String md5str = "";
         try {

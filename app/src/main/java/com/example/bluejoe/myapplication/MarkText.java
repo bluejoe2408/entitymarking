@@ -54,6 +54,8 @@ import java.util.Random;
 
 public class MarkText extends AppCompatActivity {
     public ArrayList<Mention> mentionArray = new ArrayList<>();
+    public ArrayList<Mention> importMention = new ArrayList<>();
+    private int importindex;
     private static final String TAG = "MarkText";
     public static final int TEXT_SIZE_MIN = 40;
     public static final int TEXT_SIZE_MAX = 70;
@@ -156,7 +158,7 @@ public class MarkText extends AppCompatActivity {
         };
         spanString.setSpan(clickSpan2, st, e, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
 
-
+        Log.d(TAG, "addBackColorSpan: s"+span);
         textView.setText(spanString);
     }
 
@@ -185,7 +187,11 @@ public class MarkText extends AppCompatActivity {
 //            public void run() {
 //            }
 //        }).start();
+                int num = intent.getIntExtra("num", 0);
+                for (int i = 0; i < num; i++) {
 
+                    importMention.add((Mention)intent.getSerializableExtra("mention" + i));
+                }
                 for(int i = 0; i < string.size() - 1; i++) {
                     mentionArray.add(new Mention(string.get(string.size() - 1).toString(), i,(String)string.get(i)));
                     doALotThings(string.get(i).toString(), i);
@@ -197,14 +203,52 @@ public class MarkText extends AppCompatActivity {
 //            handler.sendMessage(message);
                     Log.d(TAG, "run: " + i + " finished.");
                 }
+                Log.d(TAG, "onCreate: num"+num);
+                for (int i = 0; i < num; i++) {
+                    Mention mention = importMention.get(i);
+                    int sentenceID = mention.getSentenceId();
+                    TextView textView = textViewList.get(sentenceID);
+                    SpannableString span = (SpannableString)textView.getText();
+                    for(int j = 0; j<mention.getEntityMentions().size(); j++) {
+
+                        addBackColorSpan(textView, span,
+                                mention.getEntityMentions().get(j).getStartIndex(),
+                                mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length() - 1,
+                                (mention.getEntityMentions().get(j).getType() == "human") ? 1 : 0,
+                                sentenceID);
+                    }
+                    for(int j = 0; j<mention.getRelationMentions().size(); j++) {
+                        Random random = new Random();
+                        CardList cL = new CardList(mention.getRelationMentions().get(j).getRelation(),
+                                        mention.getSentenceText().substring(mention.getRelationMentions().get(j).getFirstEntityIndex(),
+                                                mention.getRelationMentions().get(j).getFirstEntityIndex()+
+                                                        mention.getEntityByIndex(mention.getRelationMentions().get(j).getFirstEntityIndex()).length()-1),
+                                        mention.getSentenceText().substring(mention.getRelationMentions().get(j).getSecondEntityIndex(),
+                                                mention.getRelationMentions().get(j).getSecondEntityIndex()+
+                                                        mention.getEntityByIndex(mention.getRelationMentions().get(j).getSecondEntityIndex()).length()-1),
+                                                colorList[random.nextInt(5)], R.layout.card_item);
+
+                        //CardList cardList = new CardList();
+                        //mCard.get(sentenceID).add();
+                    }
+                }
                 mAdapter = new MyPagerAdapter(aList);
                 vpager_one.setAdapter(mAdapter);
-
-            case "json":
+                break;
+            /*case "json":
+                setContentView(R.layout.activity_page);
+                vpager_one = findViewById(R.id.vpager_one);
+                aList = new ArrayList<>();
+                aList.add(view);
                 int num = intent.getIntExtra("num", 0);
                 for (int i = 0; i < num; i++) {
-                    mentionArray.add((Mention)intent.getSerializableExtra("mention" + i));
+
+                    importMention.add((Mention)intent.getSerializableExtra("mention" + i));
+                    //doALotThings(importMention.get(i).getSentenceText(), i);
                 }
+                mAdapter = new MyPagerAdapter(aList);
+                vpager_one.setAdapter(mAdapter);
+                break;*/
         }
     }
 
