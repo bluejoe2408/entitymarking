@@ -170,34 +170,42 @@ public class MarkText extends AppCompatActivity {
         inflate = LayoutInflater.from(this);
         view = inflate.inflate(R.layout.activity_mark_text,null);
         textView = view.findViewById(R.id.text_view);
-        showText();
-        setContentView(R.layout.activity_page);
-        vpager_one = findViewById(R.id.vpager_one);
-        aList = new ArrayList<>();
-        aList.add(view);
         Intent intent = getIntent();
         String type = intent.getStringExtra("type");
-        // TODO: Switch（type）Mention mention = (Mention) intentZ.getSerializableExtra("mention");
-        final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
+        switch (type) {
+            case "text":
+                final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
+                showText();
+                setContentView(R.layout.activity_page);
+                vpager_one = findViewById(R.id.vpager_one);
+                aList = new ArrayList<>();
+                aList.add(view);
 //        new Thread(new Runnable() {
 //            @Override
 //            public void run() {
 //            }
 //        }).start();
 
-        for(int i = 0; i < string.size() - 1; i++) {
-            mentionArray.add(new Mention(string.get(string.size() - 1).toString(), i,(String)string.get(i)));
-            doALotThings(string.get(i).toString(), i);
+                for(int i = 0; i < string.size() - 1; i++) {
+                    mentionArray.add(new Mention(string.get(string.size() - 1).toString(), i,(String)string.get(i)));
+                    doALotThings(string.get(i).toString(), i);
 //            Bundle bundle = new Bundle();
 //            bundle.putString("text", string.get(i).toString());
 //            Message message = new Message();
 //            message.what = UPDATE_UI;
 //            message.setData(bundle);
 //            handler.sendMessage(message);
-            Log.d(TAG, "run: " + i + " finished.");
+                    Log.d(TAG, "run: " + i + " finished.");
+                }
+                mAdapter = new MyPagerAdapter(aList);
+                vpager_one.setAdapter(mAdapter);
+
+            case "json":
+                int num = intent.getIntExtra("num", 0);
+                for (int i = 0; i < num; i++) {
+                    mentionArray.add((Mention)intent.getSerializableExtra("mention" + i));
+                }
         }
-        mAdapter = new MyPagerAdapter(aList);
-        vpager_one.setAdapter(mAdapter);
     }
 
     private void doALotThings(String string, int i) {

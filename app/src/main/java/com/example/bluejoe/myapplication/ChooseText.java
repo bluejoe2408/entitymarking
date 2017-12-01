@@ -56,6 +56,7 @@ public class ChooseText extends AppCompatActivity {
                 }
                 ArrayList<CharSequence> string = splitText(inputStream);
                 Intent intent = new Intent(ChooseText.this, MarkText.class);
+                intent.putExtra("type", "text");
                 intent.putExtra("string", string);
                 startActivity(intent);
             }
