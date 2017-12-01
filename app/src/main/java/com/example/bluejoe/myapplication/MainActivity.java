@@ -191,6 +191,16 @@ public class MainActivity extends Activity {
                                 Intent intent = new Intent(MainActivity.this, MarkText.class);
                                 intent.putExtra("type", "text");
                                 intent.putExtra("string", string);
+                                int num = 0;
+                                String articleId = Mention.getMD5(string.get(string.size() - 1).toString());
+                                for (int i = 0; i < string.size() - 2; i++) {
+                                    File jsonFile = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
+                                    if (jsonFile.exists()) {
+                                        intent.putExtra("mention" + i, MarkText.loadJSON(jsonFile));
+                                        num++;
+                                    }
+                                }
+                                intent.putExtra("num", num);
                                 startActivity(intent);
                             } catch (FileNotFoundException e) {
                                 e.printStackTrace();
