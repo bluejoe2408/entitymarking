@@ -227,7 +227,9 @@ public class MarkText extends AppCompatActivity {
                                         mention.getSentenceText().substring(mention.getRelationMentions().get(j).getSecondEntityIndex(),
                                                 mention.getRelationMentions().get(j).getSecondEntityIndex()+
                                                         mention.getEntityByIndex(mention.getRelationMentions().get(j).getSecondEntityIndex()).length()),
-                                                colorList[random.nextInt(5)], R.layout.card_item);
+                                                colorList[random.nextInt(5)], R.layout.card_item,
+                                mention.getRelationMentions().get(j).getFirstEntityIndex(),
+                                        mention.getRelationMentions().get(j).getSecondEntityIndex());
                         ListView listView = (ListView) aV.get(sentenceID).findViewById(R.id.list_view);
                         mCard.get(sentenceID).add(cL);
                         mentionArray.get(sentenceID).addRelation(mention.getRelationMentions().get(j).getFirstEntityIndex(),
@@ -339,7 +341,7 @@ public class MarkText extends AppCompatActivity {
                     Random random = new Random();
                     LoopView loopView =tmpCard.get(0).findViewById(R.id.loopView);
                     //Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
-                    CardList cL = new CardList(list.get(loopView.getSelectedItem()),ss,sss, mCard.get(index).get(mCard.get(index).size() - 1).background, R.layout.card_item);
+                    CardList cL = new CardList(list.get(loopView.getSelectedItem()),ss,sss, mCard.get(index).get(mCard.get(index).size() - 1).background, R.layout.card_item,st1,st2);
                     mCard.get(index).remove(mCard.get(index).size() - 1);
                     mCard.get(index).add(cL);
                     mentionArray.get(index).addRelation(st1,st2,list.get(loopView.getSelectedItem()));
@@ -358,14 +360,20 @@ public class MarkText extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if(cur_state==0){
+                    Log.d(TAG, "onItemLongClick: "+mentionArray.get(index).getRelationMentions().get(0).getFirstEntityIndex());
+
+                    mentionArray.get(index).removeRelation(mCard.get(index).get(i).stt1,mCard.get(index).get(i).stt2);
+
+
                     mCard.get(index).remove(i);
-                    TextView textView1 = view.findViewById(R.id.cardtext1);
-                    TextView textView2 = view.findViewById(R.id.cardtext2);
+                    Log.d(TAG, "onItemLongClick: "+mentionArray.get(index).getRelationMentions().get(0).getSecondEntityIndex());
+                    saveJSON(mentionArray.get(index));
                     tmpCard.clear();
                     adapter = new CardAdapter(MarkText.this,R.layout.card_item,mCard.get(index));
                     Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
                     listView.setAdapter(adapter);
                     listView.setSelection(mCard.size()-1);
+
                 }
                 return true;
             }
@@ -379,7 +387,7 @@ public class MarkText extends AppCompatActivity {
                 if(cur_state==0){
                     cur_state = 1;
                     Random random = new Random();
-                    CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose);
+                    CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose, 0, 0);
                     mCard.get(index).add(cL);
                     tmpCard.clear();
                     adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
@@ -551,13 +559,17 @@ public class MarkText extends AppCompatActivity {
         String secondEntity;
         String background;
         int index;
+        int stt1;
+        int stt2;
 
-        CardList(String relation, String firstEntity, String secondEntity, String background, int index) {
+        CardList(String relation, String firstEntity, String secondEntity, String background, int index,int st1,int st2) {
             this.relation = relation;
             this.firstEntity = firstEntity;
             this.secondEntity = secondEntity;
             this.background = background;
             this.index = index;
+            this.stt1 = st1;
+            this.stt2 = st2;
         }
     }
 

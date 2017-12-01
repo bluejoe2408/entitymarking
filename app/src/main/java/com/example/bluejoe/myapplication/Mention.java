@@ -1,5 +1,7 @@
 package com.example.bluejoe.myapplication;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
  */
 
 class Mention implements Serializable {
+    private static final String TAG = "Mention";
     private String articleId;
     private int sentenceId;
     private String sentenceText;
@@ -106,6 +109,8 @@ class Mention implements Serializable {
     }
 
     void removeRelation (int firstEntityIndex, int secondEntityIndex) {
+
+        Log.d(TAG, "removeRelation: "+this.relationMentions.size());
         for (int i = 0; i < this.relationMentions.size() - 1; i++) {
             RelationMention element = this.relationMentions.get(i);
             if (element.getFirstEntityIndex() == firstEntityIndex
