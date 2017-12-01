@@ -211,10 +211,10 @@ public class MarkText extends AppCompatActivity {
                     TextView textView = textViewList.get(sentenceID);
                     SpannableString span = (SpannableString)textView.getText();
                     for(int j = 0; j<mention.getEntityMentions().size(); j++) {
-
+                        s = mention.getSentenceText();
                         addBackColorSpan(textView, span,
                                 mention.getEntityMentions().get(j).getStartIndex(),
-                                mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length() - 1,
+                                mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length(),
                                 (mention.getEntityMentions().get(j).getType() == "human") ? 1 : 0,
                                 sentenceID);
                     }
@@ -223,13 +223,15 @@ public class MarkText extends AppCompatActivity {
                         CardList cL = new CardList(mention.getRelationMentions().get(j).getRelation(),
                                         mention.getSentenceText().substring(mention.getRelationMentions().get(j).getFirstEntityIndex(),
                                                 mention.getRelationMentions().get(j).getFirstEntityIndex()+
-                                                        mention.getEntityByIndex(mention.getRelationMentions().get(j).getFirstEntityIndex()).length()-1),
+                                                        mention.getEntityByIndex(mention.getRelationMentions().get(j).getFirstEntityIndex()).length()),
                                         mention.getSentenceText().substring(mention.getRelationMentions().get(j).getSecondEntityIndex(),
                                                 mention.getRelationMentions().get(j).getSecondEntityIndex()+
-                                                        mention.getEntityByIndex(mention.getRelationMentions().get(j).getSecondEntityIndex()).length()-1),
+                                                        mention.getEntityByIndex(mention.getRelationMentions().get(j).getSecondEntityIndex()).length()),
                                                 colorList[random.nextInt(5)], R.layout.card_item);
                         ListView listView = (ListView) aV.get(sentenceID).findViewById(R.id.list_view);
                         mCard.get(sentenceID).add(cL);
+                        mentionArray.get(sentenceID).addRelation(mention.getRelationMentions().get(j).getFirstEntityIndex(),
+                                mention.getRelationMentions().get(j).getSecondEntityIndex(),mention.getRelationMentions().get(j).getRelation());
                         tmpCard.clear();
                         adapter = new CardAdapter(MarkText.this,R.layout.card_item,mCard.get(sentenceID));
                         Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
