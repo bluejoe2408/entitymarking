@@ -204,6 +204,7 @@ public class MarkText extends AppCompatActivity {
                     Log.d(TAG, "run: " + i + " finished.");
                 }
                 Log.d(TAG, "onCreate: num"+num);
+
                 for (int i = 0; i < num; i++) {
                     Mention mention = importMention.get(i);
                     int sentenceID = mention.getSentenceId();
@@ -227,9 +228,13 @@ public class MarkText extends AppCompatActivity {
                                                 mention.getRelationMentions().get(j).getSecondEntityIndex()+
                                                         mention.getEntityByIndex(mention.getRelationMentions().get(j).getSecondEntityIndex()).length()-1),
                                                 colorList[random.nextInt(5)], R.layout.card_item);
-
-                        //CardList cardList = new CardList();
-                        //mCard.get(sentenceID).add();
+                        ListView listView = (ListView) aV.get(sentenceID).findViewById(R.id.list_view);
+                        mCard.get(sentenceID).add(cL);
+                        tmpCard.clear();
+                        adapter = new CardAdapter(MarkText.this,R.layout.card_item,mCard.get(sentenceID));
+                        Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
+                        listView.setAdapter(adapter);
+                        listView.setSelection(mCard.size()-1);
                     }
                 }
                 mAdapter = new MyPagerAdapter(aList);
