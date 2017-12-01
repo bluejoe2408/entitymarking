@@ -37,13 +37,13 @@
                     android:contentDescription="@string/实体1"
                     />
                 <TextView
+                    android:id="@+id/cardrelation"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="4"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:background="@drawable/border_bottom"
-                    android:text="夫妻"
                     android:maxLines="1" />
 
                 <ImageView
