@@ -17,8 +17,8 @@ class Mention implements Serializable {
     private ArrayList<EntityMention> entityMentions;
     private ArrayList<RelationMention> relationMentions;
 
-    Mention(int sentenceId, String sentenceText) {
-        this.articleId = getMD5(sentenceText);
+    Mention(String article, int sentenceId, String sentenceText) {
+        this.articleId = getMD5(article);
         this.sentenceId = sentenceId;
         this.sentenceText = sentenceText;
         this.entityMentions = new ArrayList<>();

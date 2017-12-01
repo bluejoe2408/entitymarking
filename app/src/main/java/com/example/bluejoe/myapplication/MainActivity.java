@@ -53,29 +53,29 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Mention mention = new Mention(0, "catdoglovecatdoglovecatdoglove");
-        mention.addEntity("cat", "animal", 0);
-        mention.addEntity("dog", "animal", 3);
-        mention.addRelation(0, 3, "love");
-        mention.addEntity("cat", "animal", 10);
-        mention.addEntity("dog", "animal", 13);
-        mention.addRelation(10, 13, "love");
-        mention.addEntity("cat", "animal", 20);
-        mention.addEntity("dog", "animal", 23);
-        mention.addRelation(20, 23, "love");
-        mention.removeRelation(0, 3);
-        mention.removeEntity(10);
-        if (MarkText.saveJSON(mention)) {
-            String articleId = mention.getArticleId();
-            String sentenceText = mention.getSentenceText();
-            if (MarkText.checkJSON(sentenceText) > 0) {
-                Log.d(TAG, "onCreate: checkJSON success");
-                File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
-                Mention newMention = MarkText.loadJSON(file);
-                Log.d(TAG, "onCreate: " + Environment.getExternalStorageDirectory());
-                Log.d(TAG, "onCreate: get mention md5 " + newMention.getArticleId());
-            }
-        }
+//        Mention mention = new Mention(0, "catdoglovecatdoglovecatdoglove");
+//        mention.addEntity("cat", "animal", 0);
+//        mention.addEntity("dog", "animal", 3);
+//        mention.addRelation(0, 3, "love");
+//        mention.addEntity("cat", "animal", 10);
+//        mention.addEntity("dog", "animal", 13);
+//        mention.addRelation(10, 13, "love");
+//        mention.addEntity("cat", "animal", 20);
+//        mention.addEntity("dog", "animal", 23);
+//        mention.addRelation(20, 23, "love");
+//        mention.removeRelation(0, 3);
+//        mention.removeEntity(10);
+//        if (MarkText.saveJSON(mention)) {
+//            String articleId = mention.getArticleId();
+//            String sentenceText = mention.getSentenceText();
+//            if (MarkText.checkJSON(sentenceText) > 0) {
+//                Log.d(TAG, "onCreate: checkJSON success");
+//                File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+//                Mention newMention = MarkText.loadJSON(file);
+//                Log.d(TAG, "onCreate: " + Environment.getExternalStorageDirectory());
+//                Log.d(TAG, "onCreate: get mention md5 " + newMention.getArticleId());
+//            }
+//        }
 
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);

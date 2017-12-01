@@ -59,6 +59,7 @@ public class MarkText extends AppCompatActivity {
     public static final int TEXT_SIZE_MAX = 70;
     public static final int TEXT_SIZE_STEP = 3;
     public static final int UPDATE_UI = 1;
+    public static final int UPDATE_ADAPTER = 2;
     private TextView textView;
     SpannableString spanString;
     private ArrayList<View> aV = new ArrayList<>();
@@ -92,6 +93,8 @@ public class MarkText extends AppCompatActivity {
                     textView.setText(msg.getData().getString("text"));
                     mAdapter.notifyDataSetChanged();
                     break;
+                case UPDATE_ADAPTER:
+                    mAdapter.notifyDataSetChanged();
                 default:
                     break;
             }
@@ -176,37 +179,47 @@ public class MarkText extends AppCompatActivity {
         String type = intent.getStringExtra("type");
         // TODO: Switch（type）Mention mention = (Mention) intentZ.getSerializableExtra("mention");
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for(int i = 0; i < string.size() - 1; i++) {
-                    mentionArray.add(new Mention(i,(String)string.get(i)));
-                    doALotThings(i);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("text", string.get(i).toString());
-                    Message message = new Message();
-                    message.what = UPDATE_UI;
-                    message.setData(bundle);
-                    handler.sendMessage(message);
-                    Log.d(TAG, "run: " + i + " finished.");
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        }).start();
 
+        for(int i = 0; i < string.size() - 1; i++) {
+            mentionArray.add(new Mention(string.get(string.size() - 1).toString(), i,(String)string.get(i)));
+            doALotThings(string.get(i).toString(), i);
+//            Bundle bundle = new Bundle();
+//            bundle.putString("text", string.get(i).toString());
+//            Message message = new Message();
+//            message.what = UPDATE_UI;
+//            message.setData(bundle);
+//            handler.sendMessage(message);
+            Log.d(TAG, "run: " + i + " finished.");
+        }
         mAdapter = new MyPagerAdapter(aList);
         vpager_one.setAdapter(mAdapter);
     }
 
-    private void doALotThings(int i) {
-
+    private void doALotThings(String string, int i) {
         view = inflate.inflate(R.layout.activity_mark_relation, null);
         aV.add(view);
         textView = view.findViewById(R.id.sentence_text_view);
         textViewList.add((TextView) view.findViewById(R.id.sentence_text_view));
         btnSmallerList.add((Button) view.findViewById(R.id.text_smaller));
         btnLargerList.add((Button) view.findViewById(R.id.text_larger));
+
+        textView.setTextColor(Color.BLACK);
+        textView.setBackgroundColor(Color.WHITE);
+        textView.setTextSize(18);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+        textView.setText(string);
+
         showRelation(i);
         aList.add(view);
+
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
 
         btnSmallerList.get(i).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,7 +261,7 @@ public class MarkText extends AppCompatActivity {
         spanString = new SpannableString(string.get(string.size()-1));
     }
 
-    public void  showRelation(final int index) {
+    public void showRelation(final int index) {
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
         spanString = new SpannableString(string.get(index));
@@ -463,6 +476,8 @@ public class MarkText extends AppCompatActivity {
     public static int checkJSON(String string){
         String articleId = Mention.getMD5(string);
         int i = 0;
+        Log.d(TAG, "checkJSON: " + articleId);
+        Log.d(TAG, "checkJSON: " + "entity_marking/" + articleId + "_" + i + ".json");
         File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
         while (file.exists()) {
             i++;

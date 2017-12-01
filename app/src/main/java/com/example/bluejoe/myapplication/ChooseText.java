@@ -62,6 +62,14 @@ public class ChooseText extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        for (int i = 0; i < textList.size() - 1; i++) {
+            textList.get(i).updateMentioned();
+        }
+    }
+
     public static ArrayList<CharSequence> splitText(InputStream inputStream) {
         InputStreamReader inputStreamReader = null;
         ArrayList<CharSequence> string = new ArrayList<>();
@@ -127,7 +135,7 @@ public class ChooseText extends AppCompatActivity {
         TextList(String filename) {
             this.content = getString(filename);
             this.filename = filename;
-            this.mentioned = MarkText.checkJSON(this.content);
+            this.mentioned = 0;
         }
 
         String getContent() {
@@ -138,8 +146,12 @@ public class ChooseText extends AppCompatActivity {
             return filename;
         }
 
-        int isMentioned() {
+        int getMentioned() {
             return mentioned;
+        }
+
+        void updateMentioned() {
+            this.mentioned = MarkText.checkJSON(this.content);
         }
     }
 
@@ -170,7 +182,7 @@ public class ChooseText extends AppCompatActivity {
             }
             assert textList != null;
             viewHolder.textName.setText(textList.getContent());
-            int mentioned = textList.isMentioned();
+            int mentioned = textList.getMentioned();
             if (mentioned > 0) {
                 viewHolder.textMentioned.setText("已标注" + mentioned + "句");
                 viewHolder.textMentioned.setTextColor(Color.parseColor("#88B990"));

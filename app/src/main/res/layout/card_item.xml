@@ -44,8 +44,8 @@
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:background="@drawable/border_bottom"
-                    android:maxLines="1" />
-
+                    android:maxLines="1"
+                    android:textSize="20sp"/>
                 <ImageView
                     android:layout_width="40sp"
                     android:layout_height="40sp"
