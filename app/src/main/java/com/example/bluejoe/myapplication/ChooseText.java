@@ -56,6 +56,16 @@ public class ChooseText extends AppCompatActivity {
                 }
                 ArrayList<CharSequence> string = splitText(inputStream);
                 Intent intent = new Intent(ChooseText.this, MarkText.class);
+                int num = 0;
+                String articleId = Mention.getMD5(string.get(string.size() - 1).toString());
+                for (int i = 0; i < string.size() - 2; i++) {
+                    File jsonFile = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
+                    if (jsonFile.exists()) {
+                        intent.putExtra("mention" + i, MarkText.loadJSON(jsonFile));
+                        num++;
+                    }
+                }
+                intent.putExtra("num", num);
                 intent.putExtra("type", "text");
                 intent.putExtra("string", string);
                 startActivity(intent);
