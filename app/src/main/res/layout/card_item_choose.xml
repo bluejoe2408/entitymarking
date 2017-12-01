@@ -35,11 +35,11 @@
                 android:src="@drawable/arrow_left"
                 android:contentDescription="@string/实体1"
                 />
-           <com.weigan.loopview.LoopView
+            <com.weigan.loopview.LoopView
                 android:id="@+id/loopView"
                 android:layout_width="100dp"
                 android:layout_height="40dp"
-            />
+                />
             <ImageView
                 android:layout_width="40sp"
                 android:layout_height="40sp"
