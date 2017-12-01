@@ -280,7 +280,7 @@ public class MarkText extends AppCompatActivity {
                     Random random = new Random();
                     LoopView loopView =tmpCard.get(0).findViewById(R.id.loopView);
                     //Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
-                    CardList cL = new CardList(list.get(loopView.getSelectedItem()),ss,sss, colorList[random.nextInt(5)], R.layout.card_item);
+                    CardList cL = new CardList(list.get(loopView.getSelectedItem()),ss,sss, mCard.get(index).get(mCard.get(index).size() - 1).background, R.layout.card_item);
                     mCard.get(index).remove(mCard.get(index).size() - 1);
                     mCard.get(index).add(cL);
                     mentionArray.get(index).addRelation(st1,st2,list.get(loopView.getSelectedItem()));
@@ -294,6 +294,23 @@ public class MarkText extends AppCompatActivity {
                 }
                 else Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
             }
+        });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(cur_state==0){
+                    mCard.get(index).remove(i);
+                    TextView textView1 = view.findViewById(R.id.cardtext1);
+                    TextView textView2 = view.findViewById(R.id.cardtext2);
+                    tmpCard.clear();
+                    adapter = new CardAdapter(MarkText.this,R.layout.card_item,mCard.get(index));
+                    Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
+                    listView.setAdapter(adapter);
+                    listView.setSelection(mCard.size()-1);
+                }
+                return true;
+            }
+
         });
 
         FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
@@ -312,23 +329,6 @@ public class MarkText extends AppCompatActivity {
                     listView.setSelection(mCard.size()-1);
                 }
 
-            }
-        });
-        fabBtn.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if(cur_state==0){
-                    cur_state = 1;
-                    Random random = new Random();
-                    CardList cL = new CardList("s","点击第一个","点击第二个", colorList[random.nextInt(5)], R.layout.card_item_choose);
-                    mCard.get(index).add(cL);
-
-                    adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard.get(index));
-                    Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
-                    listView.setAdapter(adapter);
-                    listView.setSelection(mCard.size()-1);
-                }
-                return true;
             }
         });
         final ActionMode.Callback2 textSelectionActionModeCallback;
