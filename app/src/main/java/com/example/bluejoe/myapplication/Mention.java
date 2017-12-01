@@ -29,7 +29,7 @@ class Mention implements Serializable {
      * EntityMention类，单个命名实体
      * 包含该命名实体的文本、类型和在句子中的位置
      */
-    class EntityMention {
+    class EntityMention implements Serializable {
         String entity;
         String type;
         int startIndex;
@@ -57,7 +57,7 @@ class Mention implements Serializable {
      * RelationMention类，单条实体关系
      * 包含一对命名实体在句子中的位置和关系名称
      */
-    class RelationMention {
+    class RelationMention implements Serializable {
         int firstEntityIndex;
         int secondEntityIndex;
         String relation;
@@ -137,7 +137,7 @@ class Mention implements Serializable {
     }
 
     String getEntityByIndex(int startIndex){
-        String entity = new String();
+        String entity = null;
         for(int i = 0; i<entityMentions.size(); i++)
             if(entityMentions.get(i).getStartIndex()==startIndex){
                 entity = entityMentions.get(i).getEntity();
