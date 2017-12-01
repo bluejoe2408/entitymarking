@@ -22,6 +22,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ClickableSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +50,9 @@ import java.util.Random;
 
 public class MarkText extends AppCompatActivity {
     private static final String TAG = "MarkText";
+    public static final int TEXT_SIZE_MIN = 40;
+    public static final int TEXT_SIZE_MAX = 70;
+    public static final int TEXT_SIZE_STEP = 3;
     private TextView textView;
     SpannableString spanString;
     private ArrayList<View> aV = new ArrayList<View>();
@@ -59,7 +64,7 @@ public class MarkText extends AppCompatActivity {
     private int cur_state = 0;
     private String ss = new String(),sss = new String();
     private String s = new String();
-    String[] colorList={"#FBFFA3", "#CABFAB", "#FEFEA4", "#EAFFD0", "#F9F9F9"};
+    String[] colorList={"#FBFFA3", "#CABFAB", "#E97A7A", "#EAFFD0", "#F9F9F9"};
 
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index) {
 
@@ -125,8 +130,36 @@ public class MarkText extends AppCompatActivity {
             view = inflate.inflate(R.layout.activity_mark_relation, null);
             aV.add(view);
             textView = view.findViewById(R.id.sentence_text_view);
+            Button text_smaller = view.findViewById(R.id.text_smaller);
+            Button text_larger = view.findViewById(R.id.text_larger);
             showRelation(i);
             aList.add(view);
+
+            text_smaller.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    float textSize = textView.getTextSize();
+                    Log.d(TAG, "onClick: " + textSize);
+                    if (textSize > TEXT_SIZE_MIN) {
+                        textSize -= TEXT_SIZE_STEP;
+                        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                        Toast.makeText(MarkText.this, "减小字号(´・ω・｀)", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            text_larger.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    float textSize = textView.getTextSize();
+                    Log.d(TAG, "onClick: " + textSize);
+                    if (textSize < TEXT_SIZE_MAX) {
+                        textSize += TEXT_SIZE_STEP;
+                        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                        Toast.makeText(MarkText.this, "增大字号(´・ω・｀)", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         //}
 
 

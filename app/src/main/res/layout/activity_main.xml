@@ -70,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
             android:padding="6dp"
-            android:background="@drawable/btn_style"
+            android:background="@drawable/menu_btn_control"
             android:text="@string/select_text"
             android:visibility="gone" />
 
@@ -78,7 +78,7 @@
             android:id="@+id/button_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/btn_style"
+            android:background="@drawable/menu_btn_control"
             android:text="@string/start"
             android:visibility="gone" />
 
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:padding="6dp"
-            android:background="@drawable/btn_style"
+            android:background="@drawable/menu_btn_control"
             android:text="@string/select_default"
             android:visibility="gone" />
 

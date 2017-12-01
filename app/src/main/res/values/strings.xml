@@ -15,4 +15,6 @@
     <string name="实体2">实体2</string>
     <string name="not_mentioned">尚未标注</string>
     <string name="is_mentioned">已标注</string>
+    <string name="minus">-</string>
+    <string name="plus">+</string>
 </resources>
