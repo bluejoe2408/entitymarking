@@ -1,19 +1,11 @@
 package com.example.bluejoe.myapplication;
 
-import android.Manifest;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
+import android.graphics.Color;
 import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,15 +15,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,8 +54,7 @@ public class ChooseText extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                ArrayList<CharSequence> string = getString(inputStream);
-                //Intent intent = new Intent(ChooseText.this, MarkText.class);
+                ArrayList<CharSequence> string = splitText(inputStream);
                 Intent intent = new Intent(ChooseText.this, MarkText.class);
                 intent.putExtra("string", string);
                 startActivity(intent);
@@ -75,9 +62,9 @@ public class ChooseText extends AppCompatActivity {
         });
     }
 
-    public static ArrayList<CharSequence> getString(InputStream inputStream) {
+    public static ArrayList<CharSequence> splitText(InputStream inputStream) {
         InputStreamReader inputStreamReader = null;
-        ArrayList<CharSequence> string = new ArrayList<CharSequence>();
+        ArrayList<CharSequence> string = new ArrayList<>();
         try {
             inputStreamReader = new InputStreamReader(inputStream, "utf-8");
         } catch (UnsupportedEncodingException e1) {
@@ -100,28 +87,38 @@ public class ChooseText extends AppCompatActivity {
         return string;
     }
 
+    String getString(String filename) {
+        InputStream inputStream;
+        try {
+            inputStream = getAssets().open(filename);
+            return MainActivity.getString(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "读取文本失败...";
+        }
+    }
+
     private void initTextList() {
-        TextList sample1 = new TextList("Sample Text 1", "texts/t0.txt");
+        TextList sample0 = new TextList("texts/t0.txt");
+        textList.add(sample0);
+        TextList sample1 = new TextList("texts/t1.txt");
         textList.add(sample1);
-        TextList sample2 = new TextList("Sample Text 2", "texts/t1.txt");
+        TextList sample2 = new TextList("texts/t2.txt");
         textList.add(sample2);
-        TextList sample3 = new TextList("Sample Text 3", "texts/t2.txt");
+        TextList sample3 = new TextList("texts/t3.txt");
         textList.add(sample3);
-        TextList sample4 = new TextList("Sample Text 4", "texts/t3.txt");
+        TextList sample4 = new TextList("texts/t4.txt");
         textList.add(sample4);
-        TextList sample5 = new TextList("Sample Text 5", "texts/t4.txt");
+        TextList sample5 = new TextList("texts/t5.txt");
         textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
-        textList.add(sample5);
+        TextList sample6 = new TextList("texts/t6.txt");
+        textList.add(sample6);
+        TextList sample7 = new TextList("texts/t7.txt");
+        textList.add(sample7);
+        TextList sample8 = new TextList("texts/t8.txt");
+        textList.add(sample8);
+        TextList sample9 = new TextList("texts/t9.txt");
+        textList.add(sample9);
     }
 
     public void writeDefaultFile() {
@@ -139,20 +136,26 @@ public class ChooseText extends AppCompatActivity {
 
     class TextList {
 
-        private String name;
+        private String content;
         private String filename;
+        private boolean mentioned;
 
-        TextList(String name, String filename) {
-            this.name = name;
+        TextList(String filename) {
+            this.content = getString(filename);
             this.filename = filename;
+            this.mentioned = MarkText.checkJSON(this.content);
         }
 
-        String getName() {
-            return name;
+        String getContent() {
+            return content;
         }
 
         String getFilename() {
             return filename;
+        }
+
+        boolean isMentioned() {
+            return mentioned;
         }
     }
 
@@ -175,18 +178,27 @@ public class ChooseText extends AppCompatActivity {
                 view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
                 viewHolder = new ViewHolder();
                 viewHolder.textName = view.findViewById(R.id.text_name);
+                viewHolder.textMentioned = view.findViewById(R.id.text_mentioned);
                 view.setTag(viewHolder);
             } else {
                 view = convertView;
                 viewHolder = (ViewHolder) view.getTag();
             }
             assert textList != null;
-            viewHolder.textName.setText(textList.getName());
+            viewHolder.textName.setText(textList.getContent());
+            if (textList.isMentioned()) {
+                viewHolder.textMentioned.setText(R.string.is_mentioned);
+                viewHolder.textMentioned.setTextColor(Color.parseColor("#88B990"));
+            } else {
+                viewHolder.textMentioned.setText(R.string.not_mentioned);
+                viewHolder.textMentioned.setTextColor(Color.parseColor("#DC3737"));
+            }
             return view;
         }
 
         class ViewHolder {
             TextView textName;
+            TextView textMentioned;
         }
     }
 }

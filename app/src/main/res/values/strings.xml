@@ -14,4 +14,6 @@
     <string name="实体1">实体1</string>
     <string name="实体2">实体2</string>
     <string name="确定">确定</string>
+    <string name="not_mentioned">尚未标注</string>
+    <string name="is_mentioned">已标注</string>
 </resources>

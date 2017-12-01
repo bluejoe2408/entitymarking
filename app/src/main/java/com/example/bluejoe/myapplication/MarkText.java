@@ -10,7 +10,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,8 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,15 +40,12 @@ import com.weigan.loopview.LoopView;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 
 public class MarkText extends AppCompatActivity {
@@ -64,6 +58,7 @@ public class MarkText extends AppCompatActivity {
     private List<ArrayList<CardList>> mCard = new ArrayList<>();
     private ArrayList<View> tmpCard = new ArrayList<>();
     private int cur_state = 0;
+    String[] colorList={"#FBFFA3", "#CABFAB", "#FEFEA4", "#EAFFD0", "#F9F9F9"};
     private String ss,sss;
     private String s;
     private CardAdapter adapter;
@@ -71,7 +66,6 @@ public class MarkText extends AppCompatActivity {
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index,final int ii) {
 
         BackgroundColorSpan span;
-
         if(index ==1) {
             span = new BackgroundColorSpan(Color.YELLOW);
 
@@ -116,7 +110,6 @@ public class MarkText extends AppCompatActivity {
                     mCard.get(ii).get(mCard.get(ii).size()-1).start2 = sss;
                     cur_state = 3;
                 }
-
             }
         };
         spanString.setSpan(clickSpan2, st, e, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -175,7 +168,6 @@ public class MarkText extends AppCompatActivity {
         Intent intent = getIntent();
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
 
-
         textView.setText(string.get(index));
         spanString = new SpannableString(string.get(index));
 
@@ -183,15 +175,20 @@ public class MarkText extends AppCompatActivity {
         View view = inflate.inflate(R.layout.activity_mark_relation,null);
         mCard.add(new ArrayList<CardList>());
         final ListView listView = aV.get(index).findViewById(R.id.list_view);
-        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+        final ListView listView = (ListView) aV.get(index).findViewById(R.id.list_view);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CardList cardList = mCard.get(i);
+                Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
             }
-        };*/
-        //List<CardList> mmData = new LinkedList<CardList>();
-        //mData.add(mmData);
-        FloatingActionButton fabBtn = aV.get(index).findViewById(R.id.fabBtn);
+        });
+
+        FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,14 +224,12 @@ public class MarkText extends AppCompatActivity {
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M)
         {
-
             textSelectionActionModeCallback = new ActionMode.Callback2() {
                 TextView curTextView = textView;
                 SpannableString curSpanString = spanString;
 
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-
 
                     return true;//返回false则不会显示弹窗
                 }
@@ -301,38 +296,86 @@ public class MarkText extends AppCompatActivity {
         }
     }
 
-    public boolean saveJSON(Mention mention) {
+    /**
+     * 将Mention类保存为JSON
+     * @param mention Mention类
+     * @return 布尔值，1表示保存成功
+     */
+    public static boolean saveJSON(Mention mention) {
         Gson gson = new Gson();
         String json = gson.toJson(mention);
-        // Write json to file
-        File file = new File(Environment.getExternalStorageDirectory(), "test.txt");
+        String articleId = mention.getArticleId();
+        // Write JSON to file
+        File dict = new File(Environment.getExternalStorageDirectory(), "entity_marking");
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
         try {
-//            FileOutputStream fos = new FileOutputStream(file);
-            FileOutputStream fos = openFileOutput("data.json", Context.MODE_PRIVATE);
+            if (!dict.exists()) {
+                if (!dict.mkdir()) {
+                    return false;
+                }
+            }
+            FileOutputStream fos = new FileOutputStream(file);
             fos.write(json.getBytes());
             fos.close();
+            Log.d(TAG, "saveJSON: success");
         } catch (IOException e) {
             e.printStackTrace();
+            Log.d(TAG, "saveJSON: failed");
+            return false;
         }
         return true;
     }
 
+    /**
+     * 从JSON文件中解析Mention类
+     * @param file File类对象
+     * @return Mention类对象
+     */
+    public static Mention loadJSON(File file) {
+        Gson gson = new Gson();
+        BufferedReader reader = null;
+        Mention mention = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String string;
+            string = reader.readLine();
+            mention = gson.fromJson(string, Mention.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return mention;
+    }
+
+    /**
+     * 检查该文本是否已经过标注
+     * @param string String类型文本内容
+     * @return 布尔值，1表示已经过标注
+     */
+    public static boolean checkJSON(String string){
+        String articleId = Mention.getMD5(string);
+        File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+        return file.exists();
+    }
+
     class CardList{
         String relation;
-        String start1;
-        String start2;
-        CardList(String relation, String start1, String start2){
+        String firstEntity;
+        String secondEntity;
+        String background;
+
+        CardList(String relation, String firstEntity, String secondEntity, String background) {
             this.relation = relation;
-            this.start1 = start1;
-            this.start2 = start2;
-        }
-        String getStart1()
-        {
-            return  start1;
-        }
-        String getStart2()
-        {
-            return start2;
+            this.firstEntity = firstEntity;
+            this.secondEntity = secondEntity;
+            this.background = background;
         }
     }
 
@@ -348,6 +391,24 @@ public class MarkText extends AppCompatActivity {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             CardList cardList = getItem(position);
+            View view;
+            ViewHolder viewHolder;
+            if (convertView == null) {
+                view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
+                viewHolder = new ViewHolder();
+                viewHolder.firstEntity = view.findViewById(R.id.first_entity);
+                viewHolder.secondEntity = view.findViewById(R.id.second_entity);
+                viewHolder.cardView = view.findViewById(R.id.card_view);
+                view.setTag(viewHolder);
+            } else {
+                view = convertView;
+                viewHolder = (ViewHolder) view.getTag();
+            }
+            if (cardList != null) {
+                viewHolder.firstEntity.setText(cardList.firstEntity);
+                viewHolder.secondEntity.setText(cardList.secondEntity);
+                viewHolder.cardView.setCardBackgroundColor(Color.parseColor(cardList.background));
+            }
             View view = LayoutInflater.from(getContext()).inflate(resourceId, parent, false);
             TextView textView1 = view.findViewById(R.id.cardtext1);
             TextView textView2 = view.findViewById(R.id.cardtext2);
@@ -358,6 +419,12 @@ public class MarkText extends AppCompatActivity {
             Log.d(TAG, "onClick: mv"+adapter.mview);
             Log.d(TAG, "onClick: size"+tmpCard.size());
             return view;
+        }
+
+        class ViewHolder {
+            TextView firstEntity;
+            TextView secondEntity;
+            CardView cardView;
         }
     }
 }

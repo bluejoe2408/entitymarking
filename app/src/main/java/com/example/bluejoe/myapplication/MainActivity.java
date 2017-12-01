@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -23,8 +24,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,25 +45,29 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Gson gson = new Gson();
-        Mention mention = new Mention("ebsfbeiukf", 0, "catdoglovecatdoglovecatdoglove");
+        Mention mention = new Mention(0, "catdoglovecatdoglovecatdoglove");
         mention.addEntity("cat", "animal", 0);
         mention.addEntity("dog", "animal", 3);
         mention.addRelation(0, 3, "love");
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.addEntity("cat", "animal", 10);
         mention.addEntity("dog", "animal", 13);
         mention.addRelation(10, 13, "love");
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.addEntity("cat", "animal", 20);
         mention.addEntity("dog", "animal", 23);
         mention.addRelation(20, 23, "love");
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.removeRelation(0, 3);
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
         mention.removeEntity(10);
-        Log.d(TAG, "onCreate: "+gson.toJson(mention));
-
+        if (MarkText.saveJSON(mention)) {
+            String articleId = mention.getArticleId();
+            String sentenceText = mention.getSentenceText();
+            if (MarkText.checkJSON(sentenceText)) {
+                Log.d(TAG, "onCreate: checkJSON success");
+                File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
+                Mention newMention = MarkText.loadJSON(file);
+                Log.d(TAG, "onCreate: " + Environment.getExternalStorageDirectory());
+                Log.d(TAG, "onCreate: get mention md5 " + newMention.getArticleId());
+            }
+        }
 
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);
@@ -96,8 +99,6 @@ public class MainActivity extends Activity {
         button_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, testActivity.class);
-//                startActivity(intent);
 //                Choose a txt file
                 openFileManager();
             }
@@ -205,6 +206,7 @@ public class MainActivity extends Activity {
      * @param uri The Uri to query.
      * @author paulburke
      */
+    @Nullable
     public static String getPath(final Context context, final Uri uri) {
         // DocumentProvider
         if (DocumentsContract.isDocumentUri(context, uri)) {
@@ -272,6 +274,7 @@ public class MainActivity extends Activity {
      * @param selectionArgs (Optional) Selection arguments used in the query.
      * @return The value of the _data column, which is typically a file path.
      */
+    @Nullable
     public static String getDataColumn(Context context, Uri uri, String selection,
                                        String[] selectionArgs) {
 
@@ -337,6 +340,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    @NonNull
     public static String getString(InputStream inputStream) {
         InputStreamReader inputStreamReader = null;
         try {
