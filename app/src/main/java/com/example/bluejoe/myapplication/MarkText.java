@@ -200,6 +200,8 @@ public class MarkText extends AppCompatActivity {
                 Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
             }
         });
+        final CardAdapter adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard);
+        listView.setAdapter(adapter);
 
         FloatingActionButton fabBtn = (FloatingActionButton) aV.get(index).findViewById(R.id.fabBtn);
         fabBtn.setOnClickListener(new View.OnClickListener() {
@@ -209,8 +211,7 @@ public class MarkText extends AppCompatActivity {
                 Random random = new Random();
                 CardList cL = new CardList("s","w","w", colorList[random.nextInt(5)]);
                 mCard.add(cL);
-                CardAdapter adapter = new CardAdapter(MarkText.this,R.layout.card_item_choose,mCard);
-                listView.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
                 Log.d(TAG, "onClick: " + ss);
                 Log.d(TAG, "onClick: "+sss);
             }
