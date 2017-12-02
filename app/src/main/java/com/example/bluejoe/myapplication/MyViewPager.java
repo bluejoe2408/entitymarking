@@ -1,5 +1,6 @@
 package com.example.bluejoe.myapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -7,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Yunzhe on 2017/12/2.
+ *
  */
 
 public class MyViewPager extends ViewPager implements ViewPager.OnPageChangeListener {
@@ -112,11 +113,6 @@ public class MyViewPager extends ViewPager implements ViewPager.OnPageChangeList
     @Override
     public int getCurrentItem() {
         return super.getCurrentItem();
-    }
-
-    @Override
-    public void setOnPageChangeListener(OnPageChangeListener listener) {
-        super.setOnPageChangeListener(listener);
     }
 
     @Override
@@ -239,6 +235,7 @@ public class MyViewPager extends ViewPager implements ViewPager.OnPageChangeList
         return super.onInterceptTouchEvent(ev);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         return super.onTouchEvent(ev);

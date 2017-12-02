@@ -4,7 +4,8 @@
     <string name="start">开始</string>
     <string name="choose">Choose from disk</string>
     <string name="人">人</string>
-    <string name="地点">地点</string>
+    <string name="国家">国家</string>
+    <string name="城市">城市</string>
     <string name="取消">取消</string>
     <string name="entity">Entity</string>
     <string name="marking">Marking</string>
@@ -18,4 +19,5 @@
     <string name="minus">-</string>
     <string name="plus">+</string>
     <string name="count_of_mentioned">已标注%1$d句</string>
+    <string name="default_string">外媒称，在即将开始的亚洲之行期间，美国总统特朗普不会访问朝鲜与韩国之间的非军事区。</string>
 </resources>

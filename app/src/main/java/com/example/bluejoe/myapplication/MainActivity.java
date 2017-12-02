@@ -17,7 +17,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -39,8 +38,6 @@ import java.util.ArrayList;
 public class MainActivity extends Activity {
 
     private static final int FILE_SELECT_CODE = 1;
-
-    private static final String TAG = "MainActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -163,7 +160,7 @@ public class MainActivity extends Activity {
                                 intent.putExtra("string", string);
                                 int num = 0;
                                 String articleId = Mention.getMD5(string.get(string.size() - 1).toString());
-                                for (int i = 0; i < string.size() - 2; i++) {
+                                for (int i = 0; i < string.size() - 1; i++) {
                                     File jsonFile = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
                                     if (jsonFile.exists()) {
                                         intent.putExtra("mention" + i, MarkText.loadJSON(jsonFile));
@@ -179,19 +176,10 @@ public class MainActivity extends Activity {
                             break;
                         }
                         case ".json": {
-                            String articleId = fName.substring(0, 32);
                             Intent intent = new Intent(MainActivity.this, MarkText.class);
-                            int i = 0;
-                            File jsonFile = new File(path.substring(0, path.length() - fName.length()) + articleId + "_" + i + ".json");
-                            while (jsonFile.exists()) {
-                                Mention mention = MarkText.loadJSON(jsonFile);
-                                intent.putExtra("mention" + i, mention);
-                                i++;
-                                jsonFile = new File(path.substring(0, path.length() - fName.length()) + articleId + "_" + i + ".json");
-                            }
+                            Mention mention = MarkText.loadJSON(file);
+                            intent.putExtra("mention", mention);
                             intent.putExtra("type", "json");
-                            intent.putExtra("num", i);
-                            Log.d(TAG, "onActivityResult: " + i);
                             startActivity(intent);
                             break;
                         }

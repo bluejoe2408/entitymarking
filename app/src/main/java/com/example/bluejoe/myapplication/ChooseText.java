@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +29,6 @@ import java.util.List;
 
 public class ChooseText extends AppCompatActivity {
 
-    private static final String TAG = "ChooseText";
     private List<TextList> textList = new ArrayList<>();
     private TextListAdapter adapter;
 
@@ -59,7 +57,7 @@ public class ChooseText extends AppCompatActivity {
                 Intent intent = new Intent(ChooseText.this, MarkText.class);
                 int num = 0;
                 String articleId = Mention.getMD5(string.get(string.size() - 1).toString());
-                for (int i = 0; i < string.size() - 2; i++) {
+                for (int i = 0; i < string.size() - 1; i++) {
                     File jsonFile = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + "_" + i + ".json");
                     if (jsonFile.exists()) {
                         intent.putExtra("mention" + i, MarkText.loadJSON(jsonFile));
@@ -77,7 +75,6 @@ public class ChooseText extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume: updating mention count");
         for (int i = 0; i < textList.size(); i++) {
             textList.get(i).updateMentioned();
         }
@@ -131,10 +128,9 @@ public class ChooseText extends AppCompatActivity {
         try {
             File file = new File(Environment.getExternalStorageDirectory(), "test.txt");
             FileOutputStream fos = new FileOutputStream(file);
-            String info = "参考消息网11月2日报道 外媒称，在即将开始的亚洲之行期间，美国总统特朗普不会访问朝鲜与韩国之间的非军事区。";
+            String info = getString(R.string.default_string);
             fos.write(info.getBytes());
             fos.close();
-            Log.d(TAG, "writeDefaultFile: Success");
         } catch (Exception e) {
             e.printStackTrace();
         }

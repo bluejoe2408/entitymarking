@@ -4,6 +4,9 @@
         android:id="@+id/human"
         android:title="@string/人" />
     <item
-        android:id="@+id/place"
-        android:title="@string/地点" />
+        android:id="@+id/city"
+        android:title="@string/城市" />
+    <item
+        android:id="@+id/country"
+        android:title="@string/国家" />
 </menu>
