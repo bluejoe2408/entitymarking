@@ -1,60 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#96EBF0">
+    android:background="#96EBF0"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="7"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/title_entity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="60sp"
-            android:textColor="#AC92FA"
             android:shadowColor="#131F1B"
-            android:shadowRadius="15"
             android:shadowDx="8"
             android:shadowDy="8"
-            android:textStyle="bold"
-            android:text="@string/entity"/>
+            android:shadowRadius="15"
+            android:text="@string/entity"
+            android:textColor="#AC92FA"
+            android:textSize="60sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/title_marking"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="60sp"
-            android:textColor="#AC92FA"
             android:shadowColor="#131F1B"
-            android:shadowRadius="15"
             android:shadowDx="8"
             android:shadowDy="8"
-            android:textStyle="bold"
-            android:text="@string/marking"/>
+            android:shadowRadius="15"
+            android:text="@string/marking"
+            android:textColor="#AC92FA"
+            android:textSize="60sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/title_version"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
             android:layout_marginEnd="25dp"
-            android:textSize="30sp"
-            android:textColor="#AC92FA"
+            android:gravity="end"
             android:shadowColor="#131F1B"
-            android:shadowRadius="15"
             android:shadowDx="8"
             android:shadowDy="8"
-            android:textStyle="bold"
+            android:shadowRadius="15"
             android:text="@string/version"
-            android:visibility="invisible"/>
+            android:textColor="#AC92FA"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <LinearLayout
@@ -69,8 +69,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
-            android:padding="6dp"
             android:background="@drawable/menu_btn_control"
+            android:padding="6dp"
             android:text="@string/select_text"
             android:visibility="gone" />
 
@@ -87,8 +87,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:padding="6dp"
             android:background="@drawable/menu_btn_control"
+            android:padding="6dp"
             android:text="@string/select_default"
             android:visibility="gone" />
 

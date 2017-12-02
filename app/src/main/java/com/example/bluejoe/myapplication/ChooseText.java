@@ -32,6 +32,7 @@ public class ChooseText extends AppCompatActivity {
 
     private static final String TAG = "ChooseText";
     private List<TextList> textList = new ArrayList<>();
+    private TextListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class ChooseText extends AppCompatActivity {
         setContentView(R.layout.activity_choose_text);
         initTextList();
         writeDefaultFile();
-        TextListAdapter adapter = new TextListAdapter(ChooseText.this,
+        adapter = new TextListAdapter(ChooseText.this,
                 R.layout.text_list_item, textList);
         ListView listView = findViewById(R.id.text_list);
         listView.setAdapter(adapter);
@@ -76,9 +77,11 @@ public class ChooseText extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        for (int i = 0; i < textList.size() - 1; i++) {
+        Log.d(TAG, "onResume: updating mention count");
+        for (int i = 0; i < textList.size(); i++) {
             textList.get(i).updateMentioned();
         }
+        adapter.notifyDataSetChanged();
     }
 
     public static ArrayList<CharSequence> splitText(InputStream inputStream) {
@@ -96,7 +99,7 @@ public class ChooseText extends AppCompatActivity {
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
-                if(!line.equals("")) string.add(line);
+                if (!line.equals("")) string.add(line);
                 sb.append("\n");
             }
         } catch (IOException e) {

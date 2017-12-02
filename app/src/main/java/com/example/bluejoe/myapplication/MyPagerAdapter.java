@@ -10,10 +10,7 @@ import java.util.ArrayList;
 public class MyPagerAdapter extends PagerAdapter {
     private ArrayList<View> viewLists;
 
-    public MyPagerAdapter() {
-    }
-
-    public MyPagerAdapter(ArrayList<View> viewLists) {
+    MyPagerAdapter(ArrayList<View> viewLists) {
         super();
         this.viewLists = viewLists;
     }

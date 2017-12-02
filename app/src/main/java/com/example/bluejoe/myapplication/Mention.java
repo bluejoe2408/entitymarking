@@ -43,11 +43,11 @@ class Mention implements Serializable {
             this.startIndex = startIndex;
         }
 
-        public String getEntity() {
+        String getEntity() {
             return entity;
         }
 
-        public String getType() {
+        String getType() {
             return type;
         }
 
@@ -79,23 +79,23 @@ class Mention implements Serializable {
             return secondEntityIndex;
         }
 
-        public String getRelation() {
+        String getRelation() {
             return relation;
         }
     }
 
-    void addEntity (String entity, String type, int startIndex) {
+    void addEntity(String entity, String type, int startIndex) {
         this.entityMentions.add(new EntityMention(entity, type, startIndex));
     }
 
-    void removeEntity (int startIndex) {
-        for (int i = 0; i < this.entityMentions.size() - 1; i++) {
+    void removeEntity(int startIndex) {
+        for (int i = 0; i < this.entityMentions.size(); i++) {
             if (this.entityMentions.get(i).getStartIndex() == startIndex) {
                 this.entityMentions.remove(i);
                 break;
             }
         }
-        for (int i = 0; i < this.relationMentions.size() - 1; i++) {
+        for (int i = 0; i < this.relationMentions.size(); i++) {
             RelationMention element = this.relationMentions.get(i);
             if (element.getFirstEntityIndex() == startIndex
                     || element.getSecondEntityIndex() == startIndex) {
@@ -104,11 +104,11 @@ class Mention implements Serializable {
         }
     }
 
-    void addRelation (int firstEntityIndex, int secondEntityIndex, String relation) {
+    void addRelation(int firstEntityIndex, int secondEntityIndex, String relation) {
         this.relationMentions.add(new RelationMention(firstEntityIndex, secondEntityIndex, relation));
     }
 
-    void removeRelation (int firstEntityIndex, int secondEntityIndex) {
+    void removeRelation(int firstEntityIndex, int secondEntityIndex) {
 
         Log.d(TAG, "removeRelation: " + this.relationMentions.size());
         for (int i = 0; i < this.relationMentions.size(); i++) {
@@ -127,26 +127,26 @@ class Mention implements Serializable {
         return articleId;
     }
 
-    public int getSentenceId() {
+    int getSentenceId() {
         return sentenceId;
     }
 
-    public String getSentenceText() {
+    String getSentenceText() {
         return sentenceText;
     }
 
-    public ArrayList<EntityMention> getEntityMentions() {
+    ArrayList<EntityMention> getEntityMentions() {
         return entityMentions;
     }
 
-    public ArrayList<RelationMention> getRelationMentions() {
+    ArrayList<RelationMention> getRelationMentions() {
         return relationMentions;
     }
 
-    String getEntityByIndex(int startIndex){
+    String getEntityByIndex(int startIndex) {
         String entity = null;
-        for(int i = 0; i<entityMentions.size(); i++)
-            if(entityMentions.get(i).getStartIndex()==startIndex){
+        for (int i = 0; i < entityMentions.size(); i++)
+            if (entityMentions.get(i).getStartIndex() == startIndex) {
                 entity = entityMentions.get(i).getEntity();
                 break;
             }

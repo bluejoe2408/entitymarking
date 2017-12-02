@@ -20,11 +20,11 @@ import java.util.ArrayList;
 
 /**
  * Created by Yunzhe on 2017/12/2.
- *
  */
 
 public class MyViewPager extends ViewPager implements ViewPager.OnPageChangeListener {
     int mCurrentPage;
+
     public MyViewPager(Context context) {
         super(context);
     }

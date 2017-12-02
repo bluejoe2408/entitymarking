@@ -2,11 +2,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape xmlns:android="http://schemas.android.com/apk/res/android">
-            <solid android:color="#F7F7F7"/>
-            <corners android:topLeftRadius="3dip"
-                android:topRightRadius="3dip"
-                android:bottomRightRadius="3dip"
-                android:bottomLeftRadius="3dip" />
+            <solid android:color="#F7F7F7" />
+            <corners android:bottomLeftRadius="3dip" android:bottomRightRadius="3dip" android:topLeftRadius="3dip" android:topRightRadius="3dip" />
         </shape>
     </item>
 </selector>

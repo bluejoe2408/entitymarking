@@ -2,9 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,14 +12,14 @@
         android:layout_weight="4">
 
         <Button
-            tools:ignore="NestedWeights"
             android:id="@+id/text_smaller"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/minus"
             android:layout_margin="2dp"
-            android:background="@drawable/text_size_btn_control"/>
+            android:layout_weight="1"
+            android:background="@drawable/text_size_btn_control"
+            android:text="@string/minus"
+            tools:ignore="NestedWeights" />
 
         <TextView
             android:id="@+id/sentence_text_view"
@@ -29,16 +29,16 @@
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
             android:paddingTop="10dp"
-            android:textIsSelectable="true"/>
+            android:textIsSelectable="true" />
 
         <Button
             android:id="@+id/text_larger"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/plus"
             android:layout_margin="2dp"
-            android:background="@drawable/text_size_btn_control"/>
+            android:layout_weight="1"
+            android:background="@drawable/text_size_btn_control"
+            android:text="@string/plus" />
 
     </LinearLayout>
 
@@ -46,26 +46,25 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </ListView>
+            android:layout_height="match_parent"></ListView>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"
+            android:src="@android:drawable/ic_input_add"
             app:backgroundTint="#C5F5C2"
-            app:rippleColor="#66A96B"
             app:fabSize="normal"
-            android:src="@android:drawable/ic_input_add"/>
+            app:rippleColor="#66A96B" />
 
     </FrameLayout>
 

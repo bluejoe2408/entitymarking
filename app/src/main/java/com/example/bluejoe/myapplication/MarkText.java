@@ -105,7 +105,7 @@ public class MarkText extends AppCompatActivity {
         }
     };
 
-    private void addBackColorSpan(final TextView textView, final SpannableString spanString, final int st, final int e, int index, final int ii) {
+    private void addBackColorSpan(final TextView textView, final SpannableString spanString, final int st, final int e, final int index, final int ii) {
 
         BackgroundColorSpan span;
         if (index == R.id.human) {
@@ -137,6 +137,10 @@ public class MarkText extends AppCompatActivity {
 
                     spanString.removeSpan(this);
                     textView.setText(spanString);
+                    Log.d(TAG, "onClick: Removing entity " + st);
+                    mentionArray.get(vpager_one.mCurrentPage).removeEntity(st);
+                    saveJSON(mentionArray.get(vpager_one.mCurrentPage));
+                    // TODO: Remove related cards
                 } else if (cur_state == 1) {
                     st1 = st;
                     ss = (String) s.subSequence(st, e);
@@ -450,11 +454,11 @@ public class MarkText extends AppCompatActivity {
 
     /**
      * 将Mention类保存为JSON
+     * 如果mention类为空则删除JSON
      *
      * @param mention Mention类
-     * @return 布尔值，1表示保存成功
      */
-    public static boolean saveJSON(Mention mention) {
+    public void saveJSON(Mention mention) {
         Gson gson = new Gson();
         String json = gson.toJson(mention);
         String articleId = mention.getArticleId();
@@ -466,20 +470,27 @@ public class MarkText extends AppCompatActivity {
         try {
             if (!dict.exists()) {
                 if (!dict.mkdir()) {
-                    return false;
+                    Toast.makeText(this, "创建目录失败，将无法保存标注结果！", Toast.LENGTH_SHORT).show();
                 }
             }
             FileOutputStream fos = new FileOutputStream(file);
-            fos.write(json.getBytes());
+            if (mention.getEntityMentions().size() == 0 && mention.getRelationMentions().size() == 0) {
+                if (file.exists()) {
+                    if (!file.delete()) {
+                        Toast.makeText(this, "删除空的标注结果失败", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                fos.write(json.getBytes());
+                Log.d(TAG, "JSON" + json);
+                Log.d(TAG, "saveJSON: success");
+            }
             fos.close();
-            Log.d(TAG, "JSON" + json);
-            Log.d(TAG, "saveJSON: success");
         } catch (IOException e) {
             e.printStackTrace();
             Log.d(TAG, "saveJSON: failed");
-            return false;
+            Toast.makeText(this, "保存标注结果失败", Toast.LENGTH_SHORT).show();
         }
-        return true;
     }
 
     /**
