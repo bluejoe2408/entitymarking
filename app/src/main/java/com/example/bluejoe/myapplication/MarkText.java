@@ -108,13 +108,15 @@ public class MarkText extends AppCompatActivity {
     private void addBackColorSpan(final TextView textView,final SpannableString spanString,final int st,final int e, int index,final int ii) {
 
         BackgroundColorSpan span;
-        if(index ==1) {
+        if (index == R.id.human) {
             span = new BackgroundColorSpan(Color.YELLOW);
             mentionArray.get(ii).addEntity(s.substring(st,e),"human",st);
-        }
-          else {
+        } else if (index == R.id.place) {
             span = new BackgroundColorSpan(Color.GREEN);
-            mentionArray.get(ii).addEntity(s.substring(st,e),"place",st);
+            mentionArray.get(ii).addEntity(s.substring(st, e), "place", st);
+        } else {
+            span = new BackgroundColorSpan(Color.WHITE);
+            Toast.makeText(this, "Unknown", Toast.LENGTH_SHORT).show();
         }
         spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -216,7 +218,7 @@ public class MarkText extends AppCompatActivity {
                         addBackColorSpan(textView, span,
                                 mention.getEntityMentions().get(j).getStartIndex(),
                                 mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length(),
-                                (Objects.equals(mention.getEntityMentions().get(j).getType(), "human")) ? 1 : 0,
+                                (Objects.equals(mention.getEntityMentions().get(j).getType(), "human")) ? R.id.human : R.id.place,
                                 sentenceID);
                     }
                     for(int j = 0; j<mention.getRelationMentions().size(); j++) {
@@ -430,34 +432,11 @@ public class MarkText extends AppCompatActivity {
                     LayoutInflater tmpinflate = LayoutInflater.from(MarkText.this);
 
                     s = ""+curTextView.getText();
-                    switch (menuItem.getItemId()){
-                        case R.id.human:
-                            int selectionStart = curTextView.getSelectionStart();
-                            int selectionEnd = curTextView.getSelectionEnd();
-
-
-
-                            addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, 1,index);
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();//收起操作菜单
-                            /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
-                            tmpTextView = tmpView.findViewById(R.id.relation_name);
-                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
-                            break;
-                        case R.id.place:
-                            selectionStart = curTextView.getSelectionStart();
-                            selectionEnd = curTextView.getSelectionEnd();
-
-
-                            addBackColorSpan(curTextView,curSpanString,selectionStart,selectionEnd, 2,index);
-                            Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
-                            actionMode.finish();
-                            /*tmpView = tmpinflate.inflate(R.layout.relation_list_item,null);
-                            tmpTextView = tmpView.findViewById(R.id.relation_name);
-                            tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
-                            break;
-                    }
-                    Log.d(TAG, "mCurrentPage: " + vpager_one.mCurrentPage);
+                    int selectionStart = curTextView.getSelectionStart();
+                    int selectionEnd = curTextView.getSelectionEnd();
+                    addBackColorSpan(curTextView,curSpanString, selectionStart,selectionEnd, menuItem.getItemId(),index);
+                    Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
+                    actionMode.finish();
                     saveJSON(mentionArray.get(vpager_one.mCurrentPage));
                     return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
                 }
