@@ -23,25 +23,28 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="2"
+                android:layout_weight="4"
+                android:background="@drawable/border_bottom"
                 android:gravity="center"
-                android:textColor="#0D625E"
+                android:maxLines="1"
+                android:textColor="#FF0000"
                 android:textSize="20sp" />
 
             <ImageView
                 android:layout_width="40sp"
-                android:layout_height="200sp"
+                android:layout_height="40sp"
                 android:contentDescription="@string/实体1"
                 android:src="@drawable/arrow_left" />
 
             <com.weigan.loopview.LoopView
                 android:id="@+id/loopView"
-                android:layout_width="100dp"
-                android:layout_height="200dp" />
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="2" />
 
             <ImageView
                 android:layout_width="40sp"
-                android:layout_height="200sp"
+                android:layout_height="40sp"
                 android:contentDescription="@string/实体2"
                 android:src="@drawable/arrow_right" />
 
@@ -50,9 +53,11 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_weight="2"
+                android:layout_weight="4"
+                android:background="@drawable/border_bottom"
                 android:gravity="center"
-                android:textColor="#0D625E"
+                android:maxLines="1"
+                android:textColor="#FF0000"
                 android:textSize="20sp" />
 
         </LinearLayout>

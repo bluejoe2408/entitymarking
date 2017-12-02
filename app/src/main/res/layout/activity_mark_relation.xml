@@ -46,25 +46,26 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        android:paddingBottom="10dp"
+        android:paddingBottom="0dp"
         android:paddingTop="10dp">
 
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>
+            android:layout_height="match_parent"
+            android:layout_marginBottom="10dp" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fabBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             android:layout_marginEnd="20dp"
             android:src="@android:drawable/ic_input_add"
-            app:backgroundTint="#C5F5C2"
+            app:backgroundTint="#DDC5F5C2"
             app:fabSize="normal"
-            app:rippleColor="#66A96B" />
+            app:rippleColor="#DD66A96B" />
 
     </FrameLayout>
 
