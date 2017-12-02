@@ -8,8 +8,6 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -48,31 +46,21 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 public class MarkText extends AppCompatActivity {
     public ArrayList<Mention> mentionArray = new ArrayList<>();
-    public ArrayList<Mention> importMention = new ArrayList<>();
     private static final String TAG = "MarkText";
     public static final int TEXT_SIZE_MIN = 40;
     public static final int TEXT_SIZE_MAX = 70;
     public static final int TEXT_SIZE_STEP = 3;
-    public static final int UPDATE_UI = 1;
-    public static final int UPDATE_ADAPTER = 2;
+    public static final int MODE_TEXT = 0;
+    public static final int MODE_JSON = 1;
     private TextView textView;
     SpannableString spanString;
     private ArrayList<View> aV = new ArrayList<>();
-
     private List<ArrayList<CardList>> mCard = new ArrayList<>();
     private ArrayList<View> tmpCard = new ArrayList<>();
     private int cur_state = 0;
@@ -89,17 +77,22 @@ public class MarkText extends AppCompatActivity {
     private LayoutInflater inflate;
     private ArrayList<View> aList;
     private MyPagerAdapter mAdapter = null;
+    private int currentMode = MODE_TEXT;
     MyViewPager vpager_one;
 
-    private void addBackColorSpan(final TextView textView, final SpannableString spanString, final int st, final int e, final int index, final int ii) {
+    private void addBackColorSpan(final TextView textView, final SpannableString spanString, final int st, final int e, final int index, final int ii, boolean addToArray) {
 
         BackgroundColorSpan span;
         if (index == R.id.human) {
             span = new BackgroundColorSpan(Color.YELLOW);
-            mentionArray.get(ii).addEntity(s.substring(st, e), "human", st);
+            if (addToArray) {
+                mentionArray.get(ii).addEntity(s.substring(st, e), "human", st);
+            }
         } else if (index == R.id.place) {
             span = new BackgroundColorSpan(Color.GREEN);
-            mentionArray.get(ii).addEntity(s.substring(st, e), "place", st);
+            if (addToArray) {
+                mentionArray.get(ii).addEntity(s.substring(st, e), "place", st);
+            }
         } else {
             span = new BackgroundColorSpan(Color.WHITE);
             Toast.makeText(this, "Unknown", Toast.LENGTH_SHORT).show();
@@ -142,8 +135,6 @@ public class MarkText extends AppCompatActivity {
                     st1 = st;
                     ss = (String) s.subSequence(st, e);
                     Log.d(TAG, "onClick: ss" + ss);
-
-//                    Log.d(TAG, "onClick: mv"+adapter.mview);
                     TextView tmpc = tmpCard.get(0).findViewById(R.id.cardtext1);
                     Log.d(TAG, "onClick: tmpcard" + tmpCard.size());
                     tmpc.setText(ss);
@@ -180,39 +171,35 @@ public class MarkText extends AppCompatActivity {
         textView = view.findViewById(R.id.text_view);
         Intent intent = getIntent();
         String type = intent.getStringExtra("type");
+        int num = intent.getIntExtra("num", 0);
         switch (type) {
             case "text":
+                currentMode = MODE_TEXT;
                 final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
                 showText();
                 setContentView(R.layout.activity_page);
                 vpager_one = findViewById(R.id.vpager_one);
                 aList = new ArrayList<>();
                 aList.add(view);
-                int num = intent.getIntExtra("num", 0);
-                for (int i = 0; i < num; i++) {
-
-                    importMention.add((Mention) intent.getSerializableExtra("mention" + i));
-                }
                 for (int i = 0; i < string.size() - 1; i++) {
                     mentionArray.add(new Mention(string.get(string.size() - 1).toString(), i, (String) string.get(i)));
                     doALotThings(string.get(i).toString(), i);
-                    Log.d(TAG, "run: " + i + " finished.");
                 }
-                Log.d(TAG, "onCreate: num" + num);
-
                 for (int i = 0; i < num; i++) {
-                    Mention mention = importMention.get(i);
+                    final Mention mention = (Mention) intent.getSerializableExtra("mention" + i);
                     int sentenceID = mention.getSentenceId();
                     TextView textView = textViewList.get(sentenceID);
                     SpannableString span = (SpannableString) textView.getText();
+
                     for (int j = 0; j < mention.getEntityMentions().size(); j++) {
                         s = mention.getSentenceText();
                         addBackColorSpan(textView, span,
                                 mention.getEntityMentions().get(j).getStartIndex(),
                                 mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length(),
                                 (Objects.equals(mention.getEntityMentions().get(j).getType(), "human")) ? R.id.human : R.id.place,
-                                sentenceID);
+                                sentenceID, true);
                     }
+
                     for (int j = 0; j < mention.getRelationMentions().size(); j++) {
                         Random random = new Random();
                         CardList cL = new CardList(mention.getRelationMentions().get(j).getRelation(),
@@ -239,20 +226,54 @@ public class MarkText extends AppCompatActivity {
                 mAdapter = new MyPagerAdapter(aList);
                 vpager_one.setAdapter(mAdapter);
                 break;
-            /*case "json":
+            case "json":
+                currentMode = MODE_JSON;
                 setContentView(R.layout.activity_page);
                 vpager_one = findViewById(R.id.vpager_one);
                 aList = new ArrayList<>();
-                aList.add(view);
-                int num = intent.getIntExtra("num", 0);
+                Log.d(TAG, "onCreate: " + num);
                 for (int i = 0; i < num; i++) {
+                    Log.d(TAG, "onCreate: " + i);
+                    final Mention mention = (Mention) intent.getSerializableExtra("mention" + i);
+                    mentionArray.add(mention);
+                    doALotThings(mention.getSentenceText(), i);
+                    int sentenceID = mention.getSentenceId();
+                    TextView textView = textViewList.get(sentenceID);
+                    SpannableString span = (SpannableString) textView.getText();
 
-                    importMention.add((Mention)intent.getSerializableExtra("mention" + i));
-                    //doALotThings(importMention.get(i).getSentenceText(), i);
+                    for (int j = 0; j < mention.getEntityMentions().size(); j++) {
+                        s = mention.getSentenceText();
+                        addBackColorSpan(textView, span,
+                                mention.getEntityMentions().get(j).getStartIndex(),
+                                mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length(),
+                                (Objects.equals(mention.getEntityMentions().get(j).getType(), "human")) ? R.id.human : R.id.place,
+                                sentenceID, false);
+                    }
+
+                    for (int j = 0; j < mention.getRelationMentions().size(); j++) {
+                        Random random = new Random();
+                        CardList cL = new CardList(mention.getRelationMentions().get(j).getRelation(),
+                                mention.getSentenceText().substring(mention.getRelationMentions().get(j).getFirstEntityIndex(),
+                                        mention.getRelationMentions().get(j).getFirstEntityIndex() +
+                                                mention.getEntityByIndex(mention.getRelationMentions().get(j).getFirstEntityIndex()).length()),
+                                mention.getSentenceText().substring(mention.getRelationMentions().get(j).getSecondEntityIndex(),
+                                        mention.getRelationMentions().get(j).getSecondEntityIndex() +
+                                                mention.getEntityByIndex(mention.getRelationMentions().get(j).getSecondEntityIndex()).length()),
+                                colorList[random.nextInt(5)], R.layout.card_item,
+                                mention.getRelationMentions().get(j).getFirstEntityIndex(),
+                                mention.getRelationMentions().get(j).getSecondEntityIndex());
+                        ListView listView = aV.get(sentenceID).findViewById(R.id.list_view);
+                        mCard.get(sentenceID).add(cL);
+                        tmpCard.clear();
+                        adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(sentenceID));
+                        Log.d(TAG, "onClick: tmpcard" + tmpCard.size());
+                        listView.setAdapter(adapter);
+                        listView.setSelection(mCard.size() - 1);
+                    }
                 }
                 mAdapter = new MyPagerAdapter(aList);
                 vpager_one.setAdapter(mAdapter);
-                break;*/
+                break;
         }
     }
 
@@ -323,7 +344,11 @@ public class MarkText extends AppCompatActivity {
         final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
         final ListView listView = aV.get(index).findViewById(R.id.list_view);
         final FloatingActionButton fabBtn = aV.get(index).findViewById(R.id.fabBtn);
-        spanString = new SpannableString(string.get(index));
+        if (string == null) {
+            spanString = new SpannableString(mentionArray.get(index).getSentenceText());
+        } else {
+            spanString = new SpannableString(string.get(index));
+        }
 
         mCard.add(new ArrayList<CardList>());
 
@@ -417,10 +442,15 @@ public class MarkText extends AppCompatActivity {
                     s = "" + curTextView.getText();
                     int selectionStart = curTextView.getSelectionStart();
                     int selectionEnd = curTextView.getSelectionEnd();
-                    addBackColorSpan(curTextView, curSpanString, selectionStart, selectionEnd, menuItem.getItemId(), index);
+                    addBackColorSpan(curTextView, curSpanString, selectionStart, selectionEnd, menuItem.getItemId(), index, true);
                     Toast.makeText(MarkText.this, "设置成功", Toast.LENGTH_SHORT).show();
                     actionMode.finish();
-                    saveJSON(mentionArray.get(vpager_one.mCurrentPage));
+                    if (currentMode == MODE_TEXT) {
+                        saveJSON(mentionArray.get(vpager_one.mCurrentPage));
+                    }
+                    else if (currentMode == MODE_JSON) {
+                        saveJSON(mentionArray.get(vpager_one.mCurrentPage + 1));
+                    }
                     return true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
                 }
 
@@ -551,22 +581,20 @@ public class MarkText extends AppCompatActivity {
             return background;
         }
 
-        public int getStt1() {
+        int getStt1() {
             return stt1;
         }
 
-        public int getStt2() {
+        int getStt2() {
             return stt2;
         }
     }
 
     class CardAdapter extends ArrayAdapter<CardList> {
-        private int resourceId;
         View mview;
 
         CardAdapter(@NonNull Context context, int resource, @NonNull List<CardList> objects) {
             super(context, resource, objects);
-            resourceId = resource;
         }
 
         @NonNull

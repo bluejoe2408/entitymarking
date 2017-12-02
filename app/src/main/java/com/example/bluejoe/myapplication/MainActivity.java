@@ -26,20 +26,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.Externalizable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 public class MainActivity extends Activity {
@@ -52,30 +46,6 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        Mention mention = new Mention(0, "catdoglovecatdoglovecatdoglove");
-//        mention.addEntity("cat", "animal", 0);
-//        mention.addEntity("dog", "animal", 3);
-//        mention.addRelation(0, 3, "love");
-//        mention.addEntity("cat", "animal", 10);
-//        mention.addEntity("dog", "animal", 13);
-//        mention.addRelation(10, 13, "love");
-//        mention.addEntity("cat", "animal", 20);
-//        mention.addEntity("dog", "animal", 23);
-//        mention.addRelation(20, 23, "love");
-//        mention.removeRelation(0, 3);
-//        mention.removeEntity(10);
-//        if (MarkText.saveJSON(mention)) {
-//            String articleId = mention.getArticleId();
-//            String sentenceText = mention.getSentenceText();
-//            if (MarkText.checkJSON(sentenceText) > 0) {
-//                Log.d(TAG, "onCreate: checkJSON success");
-//                File file = new File(Environment.getExternalStorageDirectory(), "entity_marking/" + articleId + ".json");
-//                Mention newMention = MarkText.loadJSON(file);
-//                Log.d(TAG, "onCreate: " + Environment.getExternalStorageDirectory());
-//                Log.d(TAG, "onCreate: get mention md5 " + newMention.getArticleId());
-//            }
-//        }
 
         TextView title_entity = findViewById(R.id.title_entity);
         TextView title_marking = findViewById(R.id.title_marking);
@@ -107,7 +77,7 @@ public class MainActivity extends Activity {
         button_choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Choose a txt file
+                // Choose a file
                 openFileManager();
             }
         });
@@ -209,20 +179,19 @@ public class MainActivity extends Activity {
                             break;
                         }
                         case ".json": {
-//                            List<Mention> mentionList = new ArrayList<>();
-                            String articleId = fName.substring(0, 31);
+                            String articleId = fName.substring(0, 32);
                             Intent intent = new Intent(MainActivity.this, MarkText.class);
                             int i = 0;
                             File jsonFile = new File(path.substring(0, path.length() - fName.length()) + articleId + "_" + i + ".json");
                             while (jsonFile.exists()) {
                                 Mention mention = MarkText.loadJSON(jsonFile);
                                 intent.putExtra("mention" + i, mention);
-//                                mentionList.add(MarkText.loadJSON(jsonFile));
                                 i++;
                                 jsonFile = new File(path.substring(0, path.length() - fName.length()) + articleId + "_" + i + ".json");
                             }
                             intent.putExtra("type", "json");
                             intent.putExtra("num", i);
+                            Log.d(TAG, "onActivityResult: " + i);
                             startActivity(intent);
                             break;
                         }
