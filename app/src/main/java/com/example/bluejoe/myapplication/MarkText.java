@@ -50,6 +50,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class MarkText extends AppCompatActivity {
@@ -112,7 +113,7 @@ public class MarkText extends AppCompatActivity {
         }
           else {
             span = new BackgroundColorSpan(Color.GREEN);
-            mentionArray.get(ii).addEntity(s.substring(st,e),"human",st);
+            mentionArray.get(ii).addEntity(s.substring(st,e),"place",st);
         }
         spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -215,7 +216,7 @@ public class MarkText extends AppCompatActivity {
                         addBackColorSpan(textView, span,
                                 mention.getEntityMentions().get(j).getStartIndex(),
                                 mention.getEntityMentions().get(j).getStartIndex() + mention.getEntityMentions().get(j).getEntity().length(),
-                                (mention.getEntityMentions().get(j).getType() == "human") ? 1 : 0,
+                                (Objects.equals(mention.getEntityMentions().get(j).getType(), "human")) ? 1 : 0,
                                 sentenceID);
                     }
                     for(int j = 0; j<mention.getRelationMentions().size(); j++) {
