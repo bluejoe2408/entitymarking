@@ -110,12 +110,14 @@ class Mention implements Serializable {
 
     void removeRelation (int firstEntityIndex, int secondEntityIndex) {
 
-        Log.d(TAG, "removeRelation: "+this.relationMentions.size());
-        for (int i = 0; i < this.relationMentions.size() - 1; i++) {
+        Log.d(TAG, "removeRelation: " + this.relationMentions.size());
+        for (int i = 0; i < this.relationMentions.size(); i++) {
+            Log.d(TAG, "removingRelation: " + firstEntityIndex + " and " + secondEntityIndex);
             RelationMention element = this.relationMentions.get(i);
             if (element.getFirstEntityIndex() == firstEntityIndex
                     && element.getSecondEntityIndex() == secondEntityIndex) {
                 this.relationMentions.remove(i);
+                Log.d(TAG, "removedRelation: " + firstEntityIndex + " and " + secondEntityIndex);
                 break;
             }
         }
