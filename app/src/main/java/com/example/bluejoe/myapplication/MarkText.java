@@ -419,7 +419,7 @@ public class MarkText extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             textSelectionActionModeCallback = new ActionMode.Callback2() {
                 TextView curTextView = textView;
-                SpannableString curSpanString = spanString;
+                SpannableString curSpanString = (SpannableString) textView.getText();
 
                 @Override
                 public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
