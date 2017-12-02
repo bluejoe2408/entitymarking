@@ -91,26 +91,6 @@ public class MarkText extends AppCompatActivity {
     private MyPagerAdapter mAdapter = null;
     MyViewPager vpager_one;
 
-//    @SuppressLint("HandlerLeak")
-//    private Handler handler = new Handler() {
-//        public void handleMessage(Message msg) {
-//            switch (msg.what) {
-//                case UPDATE_UI:
-//                    textView.setTextColor(Color.BLACK);
-//                    textView.setBackgroundColor(Color.WHITE);
-//                    textView.setTextSize(18);
-//                    textView.setMovementMethod(LinkMovementMethod.getInstance());
-//                    textView.setText(msg.getData().getString("text"));
-//                    mAdapter.notifyDataSetChanged();
-//                    break;
-//                case UPDATE_ADAPTER:
-//                    mAdapter.notifyDataSetChanged();
-//                default:
-//                    break;
-//            }
-//        }
-//    };
-
     private void addBackColorSpan(final TextView textView, final SpannableString spanString, final int st, final int e, final int index, final int ii) {
 
         BackgroundColorSpan span;
@@ -139,7 +119,7 @@ public class MarkText extends AppCompatActivity {
                 if (cur_state == 0) {
                     Toast.makeText(MarkText.this, "取消成功", Toast.LENGTH_SHORT).show();
                     BackgroundColorSpan span = new BackgroundColorSpan(Color.TRANSPARENT);
-                    
+
                     spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     spanString.removeSpan(this);
                     textView.setText(spanString);
@@ -208,11 +188,6 @@ public class MarkText extends AppCompatActivity {
                 vpager_one = findViewById(R.id.vpager_one);
                 aList = new ArrayList<>();
                 aList.add(view);
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        }).start();
                 int num = intent.getIntExtra("num", 0);
                 for (int i = 0; i < num; i++) {
 
@@ -221,12 +196,6 @@ public class MarkText extends AppCompatActivity {
                 for (int i = 0; i < string.size() - 1; i++) {
                     mentionArray.add(new Mention(string.get(string.size() - 1).toString(), i, (String) string.get(i)));
                     doALotThings(string.get(i).toString(), i);
-//            Bundle bundle = new Bundle();
-//            bundle.putString("text", string.get(i).toString());
-//            Message message = new Message();
-//            message.what = UPDATE_UI;
-//            message.setData(bundle);
-//            handler.sendMessage(message);
                     Log.d(TAG, "run: " + i + " finished.");
                 }
                 Log.d(TAG, "onCreate: num" + num);
