@@ -48,9 +48,17 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 
 public class MarkText extends AppCompatActivity {
     public ArrayList<Mention> mentionArray = new ArrayList<>();
@@ -131,14 +139,25 @@ public class MarkText extends AppCompatActivity {
                 if (cur_state == 0) {
                     Toast.makeText(MarkText.this, "取消成功", Toast.LENGTH_SHORT).show();
                     BackgroundColorSpan span = new BackgroundColorSpan(Color.TRANSPARENT);
+                    
                     spanString.setSpan(span, st, e, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
                     spanString.removeSpan(this);
                     textView.setText(spanString);
-                    Log.d(TAG, "onClick: Removing entity " + st);
+
                     mentionArray.get(vpager_one.mCurrentPage).removeEntity(st);
+
                     saveJSON(mentionArray.get(vpager_one.mCurrentPage));
-                    // TODO: Remove related cards
+
+                    List<CardList> cardList = mCard.get(vpager_one.mCurrentPage);
+                    for (int i = 0; i < cardList.size(); i++) {
+                        if (cardList.get(i).getStt1() == st || cardList.get(i).getStt2() == st) {
+                            cardList.remove(i);
+                        }
+                    }
+                    ListView listView = aV.get(vpager_one.mCurrentPage).findViewById(R.id.list_view);
+                    adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(vpager_one.mCurrentPage));
+                    listView.setAdapter(adapter);
+                    listView.setSelection(mCard.size() - 1);
                 } else if (cur_state == 1) {
                     st1 = st;
                     ss = (String) s.subSequence(st, e);
@@ -561,6 +580,14 @@ public class MarkText extends AppCompatActivity {
 
         String getBackground() {
             return background;
+        }
+
+        public int getStt1() {
+            return stt1;
+        }
+
+        public int getStt2() {
+            return stt2;
         }
     }
 
