@@ -341,24 +341,24 @@ public class MarkText extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                CardList cardList = mCard.get(index).get(i);
                 if (cur_state == 3) {
-                    CardView cardView = tmpCard.get(0).findViewById(R.id.card_view);
-                    Random random = new Random();
                     LoopView loopView = tmpCard.get(0).findViewById(R.id.loopView);
-                    //Log.d(TAG, "onClick: tmpcard"+tmpCard.size());
-                    CardList cL = new CardList(list.get(loopView.getSelectedItem()), ss, sss, mCard.get(index).get(mCard.get(index).size() - 1).background, R.layout.card_item, st1, st2);
+                    String previous_background = mCard.get(index).get(mCard.get(index).size() - 1).getBackground();
+                    CardList cL = new CardList(list.get(loopView.getSelectedItem()), ss, sss, previous_background, R.layout.card_item, st1, st2);
                     mCard.get(index).remove(mCard.get(index).size() - 1);
                     mCard.get(index).add(cL);
+
                     mentionArray.get(index).addRelation(st1, st2, list.get(loopView.getSelectedItem()));
-                    //Log.d(TAG, "onClick: ");
+
                     adapter = new CardAdapter(MarkText.this, R.layout.card_item, mCard.get(index));
                     listView.setAdapter(adapter);
-                    cur_state = 0;
+                    listView.setSelection(mCard.size() - 1);
 
                     saveJSON(mentionArray.get(index));
-                    listView.setSelection(mCard.size() - 1);
-                } else Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
+                    cur_state = 0;
+                } else {
+                    Toast.makeText(MarkText.this, "别戳我！", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -558,6 +558,10 @@ public class MarkText extends AppCompatActivity {
             this.index = index;
             this.stt1 = st1;
             this.stt2 = st2;
+        }
+
+        public String getBackground() {
+            return background;
         }
     }
 

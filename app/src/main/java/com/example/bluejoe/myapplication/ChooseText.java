@@ -198,7 +198,7 @@ public class ChooseText extends AppCompatActivity {
             viewHolder.textName.setText(textList.getContent());
             int mentioned = textList.getMentioned();
             if (mentioned > 0) {
-                viewHolder.textMentioned.setText("已标注" + mentioned + "句");
+                viewHolder.textMentioned.setText(String.format(getResources().getString(R.string.count_of_mentioned), mentioned));
                 viewHolder.textMentioned.setTextColor(Color.parseColor("#88B990"));
             } else {
                 viewHolder.textMentioned.setText(R.string.not_mentioned);

@@ -17,4 +17,5 @@
     <string name="not_mentioned">尚未标注</string>
     <string name="minus">-</string>
     <string name="plus">+</string>
+    <string name="count_of_mentioned">已标注%1$d句</string>
 </resources>
