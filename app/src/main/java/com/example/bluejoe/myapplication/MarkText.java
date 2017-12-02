@@ -83,6 +83,7 @@ public class MarkText extends AppCompatActivity {
     private LayoutInflater inflate;
     private ArrayList<View> aList;
     private MyPagerAdapter mAdapter = null;
+    MyViewPager vpager_one;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
@@ -167,7 +168,6 @@ public class MarkText extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ViewPager vpager_one;
         list.add("夫妻");
         list.add("邻国");
         inflate = LayoutInflater.from(this);
@@ -180,7 +180,7 @@ public class MarkText extends AppCompatActivity {
                 final ArrayList<CharSequence> string = intent.getCharSequenceArrayListExtra("string");
                 showText();
                 setContentView(R.layout.activity_page);
-                vpager_one = findViewById(R.id.vpager_one);
+                vpager_one = (MyViewPager) findViewById(R.id.vpager_one);
                 aList = new ArrayList<>();
                 aList.add(view);
 //        new Thread(new Runnable() {
@@ -457,6 +457,8 @@ public class MarkText extends AppCompatActivity {
                             tmpTextView.append(curTextView.getText(),selectionStart,selectionEnd);*/
                             break;
                     }
+                    Log.d(TAG, "mCurrentPage: " + vpager_one.mCurrentPage);
+                    saveJSON(mentionArray.get(vpager_one.mCurrentPage));
                     return  true;//返回true则系统的"复制"、"搜索"之类的item将无效，只有自定义item有响应
                 }
 
